@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us & Contact - FoodRush</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20width=%22100%22%20height=%22100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+    <!-- Header & Sticky Navbar -->
+    <header class="site-header">
+        <div class="container navbar">
+            <a href="/home/" class="logo">
+                <i class="fa-solid fa-burger"></i>
+                <span>Food<strong>Rush</strong></span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="/home/" class="nav-item">Home</a>
+                <a href="/restaurants/" class="nav-item">Restaurants</a>
+                <a href="/menu/" class="nav-item">Menu</a>
+                <a href="/about-contact/#about" class="nav-item active">About</a>
+                <a href="/about-contact/#contact" class="nav-item">Contact</a>
+            </nav>
+
+            <div class="nav-actions">
+                <div class="cart-btn-wrap">
+                    <a href="/cart/" class="cart-icon-btn" aria-label="Shopping Cart">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+
+                <div class="auth-nav-container">
+                    <a href="/auth/" class="btn btn-primary user-nav-btn">
+                        <i class="fa-regular fa-user"></i>
+                        <span>Login</span>
+                    </a>
+                </div>
+
+                <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle navigation menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <aside class="mobile-nav-drawer" id="mobile-nav-drawer">
+        <div class="drawer-header">
+            <a href="/home/" class="logo">
+                <i class="fa-solid fa-burger"></i>
+                <span>Food<strong>Rush</strong></span>
+            </a>
+            <button class="drawer-close" id="drawer-close-btn" aria-label="Close drawer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="mobile-links">
+            <a href="/home/" class="mobile-nav-item"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/restaurants/" class="mobile-nav-item"><i class="fa-solid fa-store"></i> Restaurants</a>
+            <a href="/menu/" class="mobile-nav-item"><i class="fa-solid fa-utensils"></i> Menu</a>
+            <a href="/about-contact/#about" class="mobile-nav-item active"><i class="fa-solid fa-circle-info"></i> About Us</a>
+            <a href="/about-contact/#contact" class="mobile-nav-item"><i class="fa-solid fa-envelope"></i> Contact</a>
+            <a href="/cart/" class="mobile-nav-item"><i class="fa-solid fa-bag-shopping"></i> My Cart</a>
+            <a href="/auth/" class="mobile-nav-item"><i class="fa-solid fa-user"></i> Account</a>
+        </div>
+    </aside>
+
+    <main>
+        <!-- ABOUT SECTION -->
+        <section class="section" id="about">
+            <div class="container">
+                <div class="about-hero-grid">
+                    <div>
+                        <span class="section-subtitle">Who We Are</span>
+                        <h1 class="section-title" style="margin-bottom: 20px;">Redefining Fast Food Delivery With Quality & Speed</h1>
+                        <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 18px; line-height: 1.7;">
+                            Founded in 2024, <strong>FoodRush</strong> set out with a singular mission: to make restaurant-grade gourmet burgers, artisanal stone-baked pizzas, and crispy crunch chicken accessible to everyone within 30 minutes.
+                        </p>
+                        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; line-height: 1.7;">
+                            We refuse to compromise on quality. Every single order is cooked fresh upon receiving the ticket—using non-GMO produce, 100% real dairy mozzarella, and secret spice rubs developed by culinary veterans.
+                        </p>
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                            <a href="/menu/" class="btn btn-primary">Taste the Difference</a>
+                            <a href="#contact" class="btn btn-outline">Get in Touch</a>
+                        </div>
+                    </div>
+
+                    <div class="about-img-box">
+                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80" alt="FoodRush Kitchen Team Cooking Fresh Meals" style="width: 100%; height: 380px; object-fit: cover;">
+                    </div>
+                </div>
+
+                <!-- Mission & Values Grid -->
+                <div class="values-grid">
+                    <div class="value-card">
+                        <div class="feature-icon-box" style="margin: 0 0 16px;">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                        <h3 class="feature-title">Our Story</h3>
+                        <p class="feature-desc">
+                            What started as a small cloud kitchen experiment with three friends has rapidly grown into one of the city's highest rated fast-food delivery networks.
+                        </p>
+                    </div>
+
+                    <div class="value-card">
+                        <div class="feature-icon-box" style="margin: 0 0 16px;">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <h3 class="feature-title">Our Mission</h3>
+                        <p class="feature-desc">
+                            To deliver piping hot, flavorful comfort meals faster than anyone else while upholding the highest hygiene standards and fair pricing.
+                        </p>
+                    </div>
+
+                    <div class="value-card">
+                        <div class="feature-icon-box" style="margin: 0 0 16px;">
+                            <i class="fa-solid fa-gem"></i>
+                        </div>
+                        <h3 class="feature-title">Quality Promise</h3>
+                        <p class="feature-desc">
+                            Zero frozen patties, zero artificial fillers, and recyclable eco-friendly thermal packaging that keeps food steaming hot till your doorstep.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section class="section" id="contact" style="background-color: #FFF3EB; padding: 80px 0;">
+            <div class="container">
+                <div class="section-title-wrap">
+                    <span class="section-subtitle">Get In Touch</span>
+                    <h2 class="section-title">We’d Love To Hear From You</h2>
+                    <p class="section-desc">Have a question about your order, catering inquiry, or franchise feedback? Send us a message!</p>
+                </div>
+
+                <div class="contact-layout">
+                    <!-- Left: Info Card -->
+                    <div class="contact-info-card">
+                        <div>
+                            <h3 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 10px;">Contact Information</h3>
+                            <p style="opacity: 0.9; font-size: 0.95rem;">Reach out via phone, email, or visit our central headquarters.</p>
+
+                            <div class="contact-info-list">
+                                <div class="contact-info-item">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <div>
+                                        <strong>Headquarters</strong>
+                                        <p style="opacity: 0.9; font-size: 0.88rem;">42 Rush Avenue, Central Food Hub, Suite 400</p>
+                                    </div>
+                                </div>
+
+                                <div class="contact-info-item">
+                                    <i class="fa-solid fa-phone"></i>
+                                    <div>
+                                        <strong>Helpline Number</strong>
+                                        <p style="opacity: 0.9; font-size: 0.88rem;">+91 98765 43210 / 1800-FOOD-RUSH</p>
+                                    </div>
+                                </div>
+
+                                <div class="contact-info-item">
+                                    <i class="fa-solid fa-envelope"></i>
+                                    <div>
+                                        <strong>Email Support</strong>
+                                        <p style="opacity: 0.9; font-size: 0.88rem;">support@foodrush.com</p>
+                                    </div>
+                                </div>
+
+                                <div class="contact-info-item">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <div>
+                                        <strong>Kitchen Operating Hours</strong>
+                                        <p style="opacity: 0.9; font-size: 0.88rem;">Mon - Sun: 10:00 AM - 11:30 PM</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Map Preview Area -->
+                        <div class="map-placeholder" style="background: rgba(255,255,255,0.15); border: 1px dashed rgba(255,255,255,0.4); color: #FFF;">
+                            <div style="text-align: center;">
+                                <i class="fa-solid fa-map-location-dot" style="font-size: 2.2rem; margin-bottom: 6px; display: block; color: var(--secondary);"></i>
+                                <span style="font-size: 0.9rem;">📍 Live 30-Min Delivery Radius: City Wide</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Interactive Contact Form -->
+                    <div class="contact-form-card">
+                        <h3 class="box-title" style="margin-bottom: 24px;">
+                            <i class="fa-solid fa-paper-plane"></i> Send Us a Message
+                        </h3>
+
+                        <form id="contact-form" novalidate>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="contact-name" class="form-label">Your Name *</label>
+                                    <input type="text" id="contact-name" class="form-control" placeholder="John Doe" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="contact-email" class="form-label">Email Address *</label>
+                                    <input type="email" id="contact-email" class="form-control" placeholder="john@example.com" required>
+                                </div>
+
+                                <div class="form-group col-span-2">
+                                    <label for="contact-phone" class="form-label">Phone Number *</label>
+                                    <input type="tel" id="contact-phone" class="form-control" placeholder="10-digit mobile number" required>
+                                </div>
+
+                                <div class="form-group col-span-2">
+                                    <label for="contact-message" class="form-label">Your Message / Feedback *</label>
+                                    <textarea id="contact-message" class="form-control" rows="5" placeholder="How can we help you today?" style="resize: vertical;" required></textarea>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="contact-submit-btn" class="btn btn-primary btn-block btn-lg" style="margin-top: 24px;">
+                                <i class="fa-solid fa-paper-plane"></i> Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a href="/home/" class="footer-logo">
+                        <i class="fa-solid fa-burger"></i>
+                        <span>Food<strong>Rush</strong></span>
+                    </a>
+                    <p class="footer-desc">
+                        FoodRush delivers restaurant-quality fast food straight to your door. Fresh ingredients, lightning delivery, and sensational flavors every day.
+                    </p>
+                    <div class="footer-socials">
+                        <a href="/about-contact/" class="social-btn" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="/about-contact/" class="social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="/about-contact/" class="social-btn" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="/about-contact/" class="social-btn" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="/home/">Home</a></li>
+                        <li><a href="/menu/">Full Menu</a></li>
+                        <li><a href="/about-contact/#about">Our Story</a></li>
+                        <li><a href="/about-contact/#contact">Contact Us</a></li>
+                        <li><a href="/auth/">My Account</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Categories</h4>
+                    <ul class="footer-links">
+                        <li><a href="/menu/?category=burgers">Gourmet Burgers</a></li>
+                        <li><a href="/menu/?category=pizza">Stone-Baked Pizza</a></li>
+                        <li><a href="/menu/?category=chicken">Crispy Chicken</a></li>
+                        <li><a href="/menu/?category=fries">Loaded Fries</a></li>
+                        <li><a href="/menu/?category=drinks">Milkshakes & Drinks</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Contact & Support</h4>
+                    <ul class="footer-links">
+                        <li><i class="fa-solid fa-location-dot" style="color: var(--primary); margin-right: 8px;"></i> 42 Rush Avenue, Food District</li>
+                        <li><i class="fa-solid fa-phone" style="color: var(--primary); margin-right: 8px;"></i> +91 98765 43210</li>
+                        <li><i class="fa-solid fa-envelope" style="color: var(--primary); margin-right: 8px;"></i> support@foodrush.com</li>
+                        <li><i class="fa-regular fa-clock" style="color: var(--primary); margin-right: 8px;"></i> 10:00 AM - 11:30 PM (Daily)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 FoodRush Express. All Rights Reserved.</p>
+                <p>Designed with ❤️ for Fast Food Lovers</p>
+            </div>
+        </div>
+    </footer>
+
+        <!-- Scripts -->
+    <script src="/js/firebase-config.js?v=2.2"></script>
+    <script type="module" src="/js/firebase-auth.js?v=2.2"></script>
+    <script type="module" src="/js/store-data.js?v=2.2"></script>
+    <script type="module" src="/js/location-ui.js?v=2.2"></script>
+    <script src="/js/products.js?v=2.2"></script>
+    <script src="/js/cart.js?v=2.2"></script>
+    <script src="/js/main.js?v=2.2"></script>
+    <script>
+        // Contact form validation & handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const contactForm = document.getElementById('contact-form');
+            if (!contactForm) return;
+
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const nameInput = document.getElementById('contact-name');
+                const emailInput = document.getElementById('contact-email');
+                const phoneInput = document.getElementById('contact-phone');
+                const msgInput = document.getElementById('contact-message');
+
+                let isValid = true;
+
+                if (!nameInput.value.trim() || nameInput.value.trim().length < 2) {
+                    nameInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    nameInput.classList.remove('is-invalid');
+                }
+
+                if (!emailInput.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim())) {
+                    emailInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    emailInput.classList.remove('is-invalid');
+                }
+
+                if (!phoneInput.value.trim() || !/^[0-9]{10}$/.test(phoneInput.value.trim().replace(/\D/g, ''))) {
+                    phoneInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    phoneInput.classList.remove('is-invalid');
+                }
+
+                if (!msgInput.value.trim() || msgInput.value.trim().length < 10) {
+                    msgInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    msgInput.classList.remove('is-invalid');
+                }
+
+                if (isValid) {
+                    const btn = document.getElementById('contact-submit-btn');
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending Message...';
+
+                    setTimeout(() => {
+                        contactForm.reset();
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
+                        if (typeof showToast === 'function') {
+                            showToast('💌 Message sent successfully! Our team will respond shortly.', 'primary');
+                        }
+                    }, 1000);
+                } else {
+                    if (typeof showToast === 'function') {
+                        showToast('Please fill all required fields correctly', 'danger');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

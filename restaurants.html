@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurants & Stores - FoodRush</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20width=%22100%22%20height=%22100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+    <!-- Header & Sticky Navbar -->
+    <header class="site-header">
+        <div class="container navbar">
+            <a href="/home/" class="logo">
+                <i class="fa-solid fa-burger"></i>
+                <span>Food<strong>Rush</strong></span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="/home/" class="nav-item">Home</a>
+                <a href="/restaurants/" class="nav-item active">Restaurants</a>
+                <a href="/menu/" class="nav-item">Menu</a>
+                <a href="/about-contact/#about" class="nav-item">About</a>
+                <a href="/about-contact/#contact" class="nav-item">Contact</a>
+            </nav>
+
+            <div class="nav-actions">
+                <div class="cart-btn-wrap">
+                    <a href="/cart/" class="cart-icon-btn" aria-label="Shopping Cart">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+
+                <div class="auth-nav-container">
+                    <a href="/auth/" class="btn btn-primary user-nav-btn">
+                        <i class="fa-regular fa-user"></i>
+                        <span>Login</span>
+                    </a>
+                </div>
+
+                <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle navigation menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <aside class="mobile-nav-drawer" id="mobile-nav-drawer">
+        <div class="drawer-header">
+            <a href="/home/" class="logo">
+                <i class="fa-solid fa-burger"></i>
+                <span>Food<strong>Rush</strong></span>
+            </a>
+            <button class="drawer-close" id="drawer-close-btn" aria-label="Close drawer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="mobile-links">
+            <a href="/home/" class="mobile-nav-item"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/restaurants/" class="mobile-nav-item active"><i class="fa-solid fa-store"></i> Restaurants</a>
+            <a href="/menu/" class="mobile-nav-item"><i class="fa-solid fa-utensils"></i> Menu</a>
+            <a href="/about-contact/#about" class="mobile-nav-item"><i class="fa-solid fa-circle-info"></i> About Us</a>
+            <a href="/about-contact/#contact" class="mobile-nav-item"><i class="fa-solid fa-envelope"></i> Contact</a>
+            <a href="/cart/" class="mobile-nav-item"><i class="fa-solid fa-bag-shopping"></i> My Cart</a>
+            <a href="/auth/" class="mobile-nav-item"><i class="fa-solid fa-user"></i> Account</a>
+        </div>
+    </aside>
+
+    <!-- Page Banner -->
+    <section class="page-banner" style="padding: 40px 0 30px; background: linear-gradient(135deg, #FFF5F0 0%, #FFEFE7 100%);">
+        <div class="container">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                <div>
+                    <span class="section-subtitle">Partner Stores & Kitchens</span>
+                    <h1 style="font-size: 2.1rem; font-weight: 800; margin-top: 4px;" id="rest-page-heading">
+                        Top Restaurants Near You
+                    </h1>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;" id="rest-location-subtext">
+                        Explore curated restaurants, live offers, and super-fast delivery to your doorstep.
+                    </p>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" onclick="openLocationModal()" style="background: #fff;">
+                    <i class="fa-solid fa-location-crosshairs" style="color: var(--primary);"></i> Change Delivery Area
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <main class="section" style="padding-top: 30px;">
+        <div class="container">
+
+            <!--LIST OF VIEWS: 1. ALL RESTAURANTS DIRECTORY  2. SINGLE RESTAURANT DETAIL VIEW -->
+            
+            <!-- VIEW 1: RESTAURANT DIRECTORY -->
+            <div id="restaurants-directory-view">
+                
+                <!-- Cuisine Category Pills (Indian, Chinese, Pizza, Burger, Biryani, Cafe, Bakery, Fast Food) -->
+                <div class="cuisine-filter-pills" id="cuisine-pills-bar" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 14px; margin-bottom: 20px;">
+                    <button type="button" class="filter-pill active" data-cuisine="all"><i class="fa-solid fa-border-all"></i> All Restaurants</button>
+                    <button type="button" class="filter-pill" data-cuisine="Indian"><i class="fa-solid fa-bowl-rice"></i> Indian</button>
+                    <button type="button" class="filter-pill" data-cuisine="Chinese"><i class="fa-solid fa-utensils"></i> Chinese</button>
+                    <button type="button" class="filter-pill" data-cuisine="Pizza"><i class="fa-solid fa-pizza-slice"></i> Pizza</button>
+                    <button type="button" class="filter-pill" data-cuisine="Burger"><i class="fa-solid fa-burger"></i> Burger</button>
+                    <button type="button" class="filter-pill" data-cuisine="Biryani"><i class="fa-solid fa-fire-burner"></i> Biryani</button>
+                    <button type="button" class="filter-pill" data-cuisine="Cafe"><i class="fa-solid fa-mug-hot"></i> Cafe</button>
+                    <button type="button" class="filter-pill" data-cuisine="Bakery"><i class="fa-solid fa-cake-candles"></i> Bakery</button>
+                    <button type="button" class="filter-pill" data-cuisine="Fast Food"><i class="fa-solid fa-bolt"></i> Fast Food</button>
+                </div>
+
+                <!-- Search & Advanced Filters Bar -->
+                <div class="rest-controls-bar">
+                    <div class="rest-search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="rest-search-input" class="form-control" placeholder="Search by restaurant name, cuisine, or dish (e.g. Burger, Pizza, Biryani)...">
+                    </div>
+
+                    <div class="rest-filters-group">
+                        <select id="rest-name-select" class="form-control">
+                            <option value="all">🏪 All Restaurant Names</option>
+                        </select>
+
+                        <select id="rest-rating-filter" class="form-control">
+                            <option value="0">All Ratings</option>
+                            <option value="4.5">⭐ 4.5+ Rated</option>
+                            <option value="4.7">⭐ 4.7+ Top Rated</option>
+                        </select>
+
+                        <select id="rest-sort-select" class="form-control">
+                            <option value="recommended">Sort: Recommended</option>
+                            <option value="rating">Rating: High to Low</option>
+                            <option value="delivery_time">Delivery Time: Fastest</option>
+                            <option value="price_low">Cost for Two: Low to High</option>
+                            <option value="delivery_fee">Lowest Delivery Fee</option>
+                        </select>
+
+                        <label class="menu-toggle-pill">
+                            <input type="checkbox" id="rest-offers-only-check" style="accent-color: var(--primary);">
+                            <i class="fa-solid fa-tag" style="color: var(--primary);"></i> Offers Only
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Restaurant Cards Grid -->
+                <div class="restaurants-grid" id="restaurants-grid-container"></div>
+
+                <!-- Matching Category / Search Dishes Grid (Shows Burgers, Pizzas, Biryanis, etc. with Images & Offers directly when filtering!) -->
+                <div id="restaurants-matching-dishes-section" style="margin-top: 42px; display: none;">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border-light);">
+                        <div>
+                            <span class="section-subtitle" id="matching-dishes-subtitle">Direct Order Menu</span>
+                            <h2 style="font-size: 1.55rem; font-weight: 800; margin: 2px 0 0;" id="matching-dishes-heading">
+                                Popular Dishes in This Category
+                            </h2>
+                        </div>
+                        <a href="/menu/" class="btn btn-outline btn-sm">
+                            <i class="fa-solid fa-utensils"></i> Open Full Menu Page
+                        </a>
+                    </div>
+                    <div class="food-grid" id="restaurants-matching-dishes-grid"></div>
+                </div>
+
+                <!-- Empty / Out of Delivery Area State -->
+                <div id="restaurants-empty-state" style="display: none; text-align: center; padding: 60px 20px; background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
+                    <i class="fa-solid fa-store-slash" style="font-size: 3.5rem; color: var(--primary); margin-bottom: 16px;"></i>
+                    <h3 id="rest-empty-title" style="font-size: 1.4rem; margin-bottom: 8px;">No Restaurants Found</h3>
+                    <p id="rest-empty-desc" style="color: var(--text-muted); max-width: 460px; margin: 0 auto 20px;">
+                        We couldn't find any restaurants matching your search or delivery area.
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="resetRestaurantFilters()">Reset All Filters</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="openLocationModal()">Change Delivery Location</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: SINGLE RESTAURANT DETAIL & COMPLETE MENU PAGE -->
+            <div id="restaurant-detail-view" style="display: none;">
+                <div style="margin-bottom: 20px;">
+                    <a href="/restaurants/" class="btn btn-outline btn-sm">
+                        <i class="fa-solid fa-arrow-left"></i> Back to All Restaurants
+                    </a>
+                </div>
+
+                <!-- Restaurant Hero Header -->
+                <div id="single-restaurant-hero"></div>
+
+                <!-- Restaurant Active Offers Bar -->
+                <div id="single-restaurant-offers" style="margin: 24px 0;"></div>
+
+                <!-- Menu Filter & Search inside Restaurant -->
+                <div class="single-rest-menu-header">
+                    <h2 class="single-rest-menu-title">
+                        <i class="fa-solid fa-book-open" style="color: var(--primary);"></i> Complete Food Menu
+                    </h2>
+                    <div class="single-rest-menu-controls">
+                        <div class="rest-search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="rest-menu-search" class="form-control" placeholder="Search dish by name in this menu...">
+                        </div>
+                        <label class="menu-toggle-pill">
+                            <input type="checkbox" id="rest-menu-veg-only" style="accent-color: #10B981;">
+                            <span style="color: #10B981;">●</span> Veg Only
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Dynamic Category Pills inside Single Restaurant Menu -->
+                <div id="single-rest-category-pills" class="cuisine-filter-pills" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 14px; margin-bottom: 20px;"></div>
+
+                <!-- Restaurant Menu Items Grid -->
+                <div class="food-grid" id="single-restaurant-menu-grid"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a href="/home/" class="footer-logo">
+                        <i class="fa-solid fa-burger"></i>
+                        <span>Food<strong>Rush</strong></span>
+                    </a>
+                    <p class="footer-desc">
+                        Delivering happiness from top-rated local restaurants & kitchens straight to your door.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="footer-col-title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="/home/">Home</a></li>
+                        <li><a href="/restaurants/">Partner Restaurants</a></li>
+                        <li><a href="/menu/">Full Menu</a></li>
+                        <li><a href="/cart/">Shopping Cart</a></li>
+                        <li><a href="/admin/">Partner / Admin Portal</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-col-title">Contact & Support</h4>
+                    <ul class="footer-links">
+                        <li><i class="fa-solid fa-location-dot" style="color: var(--primary); margin-right: 8px;"></i> 42 Rush Avenue, New Delhi</li>
+                        <li><i class="fa-solid fa-envelope" style="color: var(--primary); margin-right: 8px;"></i> support@foodrush.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 FoodRush Express. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+        <!-- Scripts -->
+    <script src="/js/firebase-config.js?v=2.2"></script>
+    <script type="module" src="/js/firebase-auth.js?v=2.2"></script>
+    <script type="module" src="/js/store-data.js?v=2.2"></script>
+    <script type="module" src="/js/location-ui.js?v=2.2"></script>
+    <script src="/js/products.js?v=2.2"></script>
+    <script src="/js/cart.js?v=2.2"></script>
+    <script src="/js/main.js?v=2.2"></script>
+    <script type="module" src="/js/restaurants.js?v=2.2"></script>
+    </body>
+</html>

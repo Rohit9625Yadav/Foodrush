@@ -1,0 +1,703 @@
+/* ==========================================================================
+   FoodRush - Complete Responsive Breakpoints (Desktop, Laptop, Tablet & Mobile)
+   ========================================================================== */
+
+/* --- 1. Medium Desktops & Laptops (max-width: 1200px) --- */
+@media (max-width: 1200px) {
+    .container {
+        padding: 0 18px;
+    }
+
+    .nav-links {
+        gap: 20px;
+    }
+
+    .nav-item {
+        font-size: 0.9rem;
+    }
+
+    .header-location-pill {
+        max-width: 195px;
+        padding: 5px 12px;
+    }
+
+    .nav-actions {
+        gap: 10px;
+    }
+}
+
+/* --- 2. Small Laptops & Landscape Tablets (max-width: 992px) --- */
+@media (max-width: 992px) {
+    /* Switch to Mobile Hamburger Drawer at 992px so Header never crowds */
+    .nav-links {
+        display: none;
+    }
+
+    .hamburger-btn {
+        display: flex;
+    }
+
+    .header-location-pill {
+        max-width: 240px;
+        margin-right: auto;
+        margin-left: 14px;
+    }
+
+    .hero-title {
+        font-size: 2.7rem;
+    }
+
+    .hero-grid {
+        gap: 28px;
+    }
+
+    .hero-main-img {
+        max-width: 390px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    .details-grid {
+        gap: 30px;
+        padding: 28px;
+    }
+
+    .cart-layout,
+    .checkout-layout {
+        grid-template-columns: 1fr;
+    }
+
+    /* Admin Dashboard Tablet View */
+    .admin-layout {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+    }
+
+    .admin-sidebar-header {
+        padding: 14px 20px;
+    }
+
+    .admin-sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 10px 14px;
+        gap: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-nav-btn {
+        padding: 9px 14px;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+
+    .admin-sidebar-footer {
+        display: none;
+    }
+
+    .menu-builder-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* --- 3. Tablets & Large Phones (max-width: 768px) --- */
+@media (max-width: 768px) {
+    .section {
+        padding: 50px 0;
+    }
+
+    .section-title {
+        font-size: 1.95rem;
+    }
+
+    .section-title-wrap {
+        margin-bottom: 32px;
+    }
+
+    .hero-section {
+        padding: 28px 0 50px;
+    }
+
+    .hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .hero-subtitle {
+        margin: 0 auto 28px;
+        font-size: 1rem;
+    }
+
+    .hero-btns {
+        justify-content: center;
+    }
+
+    .hero-stats {
+        justify-content: center;
+        gap: 24px;
+    }
+
+    .hero-blob-bg {
+        width: 300px;
+        height: 300px;
+    }
+
+    .floating-badge-1 {
+        left: 8px;
+    }
+
+    .floating-badge-2 {
+        right: 8px;
+    }
+
+    /* Promotional Offer Banner */
+    .offer-banner {
+        padding: 34px 24px;
+    }
+
+    .offer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .offer-title {
+        font-size: 2rem;
+    }
+
+    .offer-desc {
+        margin: 0 auto 22px;
+    }
+
+    /* Product Details & About/Contact */
+    .details-grid,
+    .about-hero-grid,
+    .contact-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .details-img-wrap {
+        height: 290px;
+    }
+
+    /* Restaurant Directory Controls, Menu Controls & Category Pills */
+    .cuisine-filter-pills,
+    .menu-filter-pills {
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px !important;
+        scrollbar-width: thin;
+    }
+
+    .cuisine-filter-pills .filter-pill,
+    .menu-filter-pills .filter-pill {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    .menu-controls {
+        padding: 18px 16px;
+        margin-bottom: 24px;
+    }
+
+    .menu-search-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .search-input-wrap {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    .menu-selects-group {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .menu-selects-group .sort-select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .menu-toggles-group {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .menu-toggles-group .menu-toggle-pill {
+        width: 100%;
+    }
+
+    .rest-controls-bar {
+        flex-direction: column;
+        align-items: stretch !important;
+        padding: 16px !important;
+    }
+
+    .rest-search-box {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    .rest-filters-group {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .rest-filters-group .form-control,
+    .rest-filters-group .menu-toggle-pill {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .single-rest-menu-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .single-rest-menu-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .single-rest-menu-controls .rest-search-box,
+    .single-rest-menu-controls .menu-toggle-pill {
+        width: 100%;
+    }
+
+    /* Single Restaurant Detail Hero */
+    .single-rest-hero-cover {
+        min-height: auto;
+        padding: 36px 18px 20px;
+    }
+
+    .single-rest-hero-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .single-rest-brand {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .single-rest-logo {
+        width: 64px;
+        height: 64px;
+    }
+
+    .single-rest-title-row h1 {
+        font-size: 1.4rem;
+    }
+
+    .single-rest-stats-glass {
+        width: 100%;
+        padding: 10px 12px;
+    }
+
+    .single-rest-subbar {
+        padding: 14px 18px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Forms & Checkout */
+    .payment-tabs,
+    .delivery-options-grid,
+    .form-grid,
+    .form-grid-2,
+    .form-grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.col-span-2 {
+        grid-column: span 1;
+    }
+
+    /* Admin Dashboard */
+    .admin-topbar {
+        padding: 14px 18px;
+    }
+
+    .admin-content-body {
+        padding: 18px 14px;
+    }
+
+    .admin-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
+
+/* --- 4. Mobile Phones (max-width: 640px) --- */
+@media (max-width: 640px) {
+    /* Two-row Swiggy/Zomato-style Mobile Header so Logo, Actions & Location Bar never collide */
+    .site-header,
+    .site-header.scrolled {
+        height: auto;
+        min-height: 68px;
+        padding: 10px 0;
+    }
+
+    .navbar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .logo {
+        font-size: 1.4rem;
+        order: 1;
+    }
+
+    .logo i {
+        font-size: 1.5rem;
+    }
+
+    .nav-actions {
+        order: 2;
+        gap: 8px;
+        margin-left: auto;
+    }
+
+    .header-location-pill {
+        order: 3;
+        width: 100%;
+        max-width: 100%;
+        margin: 2px 0 0;
+        padding: 7px 14px;
+        justify-content: flex-start;
+        border-radius: 10px;
+    }
+
+    .loc-pill-text {
+        flex: 1;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .loc-pill-top {
+        font-size: 0.7rem;
+        flex-shrink: 0;
+    }
+
+    .loc-pill-main {
+        font-size: 0.82rem;
+    }
+
+    /* Compact User Badge on Mobile Header */
+    .user-profile-badge {
+        padding: 4px 10px 4px 4px;
+    }
+
+    .user-profile-badge span {
+        max-width: 72px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.82rem !important;
+    }
+
+    .user-nav-btn {
+        padding: 8px 14px;
+        font-size: 0.82rem;
+    }
+
+    .cart-icon-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1.05rem;
+    }
+
+    /* Mobile Menu & Restaurant Filter Controls */
+    .menu-controls {
+        padding: 14px 12px;
+        margin-bottom: 20px;
+    }
+
+    .search-input {
+        padding: 12px 14px 12px 42px;
+        font-size: 0.88rem;
+    }
+
+    .menu-selects-group,
+    .rest-filters-group {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .sort-select {
+        padding: 11px 14px;
+        font-size: 0.86rem;
+    }
+
+    .menu-toggle-pill {
+        padding: 9px 10px;
+        font-size: 0.82rem;
+    }
+
+    .filter-pill {
+        padding: 7px 14px;
+        font-size: 0.82rem;
+    }
+
+    /* Grids: Full-width cards on mobile phones */
+    .restaurants-grid,
+    .home-offers-grid,
+    .food-grid,
+    .single-rest-offers-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .food-card {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .food-img-wrap {
+        height: 185px;
+    }
+
+    .food-card-body {
+        padding: 14px 16px 16px;
+    }
+
+    .food-title {
+        font-size: 1.05rem;
+    }
+
+    .categories-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+
+    .category-card {
+        padding: 12px 8px;
+    }
+
+    .cat-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 1.15rem;
+    }
+
+    .cat-name {
+        font-size: 0.78rem;
+    }
+
+    /* Cart Table Mobile Optimization - Clean 2-Row Card Layout */
+    .cart-items-card,
+    .cart-summary-card,
+    .checkout-box {
+        padding: 18px 14px;
+    }
+
+    .cart-table,
+    .cart-table tbody {
+        display: block;
+        width: 100%;
+    }
+
+    .cart-table thead {
+        display: none;
+    }
+
+    .cart-table tr.cart-item-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .cart-table tr.cart-item-row:last-child {
+        border-bottom: none;
+        padding-bottom: 4px;
+    }
+
+    .cart-table td {
+        padding: 0;
+        border-bottom: none;
+    }
+
+    .cart-table td.cart-col-product {
+        order: 1;
+        flex: 1 1 calc(100% - 48px);
+        min-width: 0;
+    }
+
+    .cart-table td.cart-col-remove {
+        order: 2;
+        flex: 0 0 auto;
+    }
+
+    .cart-table td.cart-col-price {
+        display: none;
+    }
+
+    .cart-table td.cart-col-qty {
+        order: 3;
+        flex: 0 0 auto;
+    }
+
+    .cart-table td.cart-col-subtotal {
+        order: 4;
+        flex: 0 0 auto;
+        margin-left: auto;
+        font-size: 1rem;
+        color: var(--secondary);
+    }
+
+    .mobile-subtotal-label {
+        display: inline;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-right: 4px;
+    }
+
+    .cart-product-cell {
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .cart-product-img {
+        width: 58px;
+        height: 58px;
+    }
+
+    .cart-product-name {
+        font-size: 0.96rem;
+        line-height: 1.35;
+        word-break: break-word;
+    }
+
+    .cart-actions-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .cart-continue-btns {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .cart-continue-btns .btn,
+    .cart-clear-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .coupon-box {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .coupon-box .btn {
+        width: 100%;
+    }
+
+    /* Modals on Mobile */
+    .location-modal-backdrop,
+    .modal-backdrop {
+        padding: 10px;
+    }
+
+    .location-modal-header,
+    .location-modal-body {
+        padding: 16px;
+    }
+
+    .order-modal-card,
+    .otp-modal-card {
+        padding: 24px 18px;
+    }
+
+    .otp-field {
+        width: 42px;
+        height: 48px;
+        font-size: 1.25rem;
+    }
+
+    .menu-builder-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- 5. Compact Smartphones (max-width: 420px) --- */
+@media (max-width: 420px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-btns .btn {
+        width: 100%;
+    }
+
+    .hero-stats {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .floating-badge {
+        display: none;
+    }
+
+    .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .user-profile-badge span {
+        display: none;
+    }
+
+    .user-profile-badge {
+        padding: 3px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .admin-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .toast {
+        min-width: calc(100vw - 32px);
+        max-width: calc(100vw - 32px);
+        right: 16px;
+        bottom: 16px;
+    }
+}

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodRush - Delicious Fast Food Delivered To Your Door</title>
+    <!-- Favicon -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20width=%22100%22%20height=%22100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+    <!-- Font Awesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Main & Responsive CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+
+<body>
+
+    <!-- Header & Sticky Navbar -->
+    <header class="site-header">
+        <div class="container navbar">
+            <a href="/home/" class="logo">
+                <i class="fa-solid fa-burger"></i>
+                <span>Food<strong>Rush</strong></span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="/home/" class="nav-item active">Home</a>
+                <a href="/restaurants/" class="nav-item">Restaurants</a>
+                <a href="/menu/" class="nav-item">Menu</a>
+                <a href="/about-contact/#about" class="nav-item">About</a>
+                <a href="/about-contact/#contact" class="nav-item">Contact</a>
+            </nav>
+
+            <div class="nav-actions">
+                <div class="cart-btn-wrap">
+                    <a href="/cart/" class="cart-icon-btn" aria-label="Shopping Cart">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+
+                <div class="auth-nav-container">
+                    <a href="/auth/" class="btn btn-primary user-nav-btn">
+                        <i class="fa-regular fa-user"></i>
+                        <span>Login</span>
+                    </a>
+                </div>
+
+                <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle navigation menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <aside class="mobile-nav-drawer" id="mobile-nav-drawer">
+        <div class="drawer-header">
+            <a href="/home/" class="logo">
+                <i class="fa-solid fa-burger"></i>
+                <span>Food<strong>Rush</strong></span>
+            </a>
+            <button class="drawer-close" id="drawer-close-btn" aria-label="Close drawer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="mobile-links">
+            <a href="/home/" class="mobile-nav-item active"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/restaurants/" class="mobile-nav-item"><i class="fa-solid fa-store"></i> Restaurants</a>
+            <a href="/menu/" class="mobile-nav-item"><i class="fa-solid fa-utensils"></i> Menu</a>
+            <a href="/about-contact/#about" class="mobile-nav-item"><i class="fa-solid fa-circle-info"></i> About
+                Us</a>
+            <a href="/about-contact/#contact" class="mobile-nav-item"><i class="fa-solid fa-envelope"></i>
+                Contact</a>
+            <a href="/cart/" class="mobile-nav-item"><i class="fa-solid fa-bag-shopping"></i> My Cart</a>
+            <a href="/auth/" class="mobile-nav-item"><i class="fa-solid fa-user"></i> Account</a>
+        </div>
+        <div class="drawer-footer">
+            <a href="/menu/" class="btn btn-primary btn-block">Order Now</a>
+        </div>
+    </aside>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-grid">
+                    <div class="hero-content">
+                        <span class="hero-tag">
+                            <i class="fa-solid fa-fire"></i> Free Express Delivery on ₹500+
+                        </span>
+                        <h1 class="hero-title">
+                            Delicious Food Delivered <span class="highlight">To Your Door</span>
+                        </h1>
+                        <p class="hero-subtitle">
+                            Fresh, hot and tasty meals delivered fast to your doorstep. Savor gourmet burgers,
+                            stone-baked pizzas, and crispy chicken specials in 30 minutes!
+                        </p>
+                        <div class="hero-btns">
+                            <a href="/menu/" class="btn btn-primary btn-lg">
+                                <i class="fa-solid fa-bolt"></i> Order Now
+                            </a>
+                            <a href="/menu/" class="btn btn-outline btn-lg">
+                                <i class="fa-solid fa-utensils"></i> Explore Menu
+                            </a>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <h3>30 min</h3>
+                                <p>Super Fast Delivery</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>50,000+</h3>
+                                <p>Happy Foodies</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>4.9 <i class="fa-solid fa-star"
+                                        style="color: var(--secondary); font-size: 0.9rem;"></i></h3>
+                                <p>Customer Rating</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hero-image-wrap">
+                        <div class="hero-blob-bg"></div>
+                        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80"
+                            alt="Delicious FoodRush Gourmet Burger" class="hero-main-img">
+
+                        <!-- Floating Badges -->
+                        <div class="floating-badge floating-badge-1">
+                            <div class="badge-icon-box">
+                                <i class="fa-solid fa-stopwatch"></i>
+                            </div>
+                            <div class="badge-content">
+                                <h4>Super Fast</h4>
+                                <p>25-30 Mins avg.</p>
+                            </div>
+                        </div>
+
+                        <div class="floating-badge floating-badge-2">
+                            <div class="badge-icon-box yellow">
+                                <i class="fa-solid fa-heart"></i>
+                            </div>
+                            <div class="badge-content">
+                                <h4>100% Fresh</h4>
+                                <p>Premium Quality</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="section" style="padding-top: 20px;">
+            <div class="container">
+                <div class="section-title-wrap">
+                    <span class="section-subtitle">Restaurant & Food Categories</span>
+                    <h2 class="section-title">Explore Cuisines & Flavor Categories</h2>
+                    <p class="section-desc">Jump straight into partner restaurants or menu cravings by cuisine.</p>
+                </div>
+
+                <div class="categories-grid">
+                    <a href="/restaurants/?cuisine=Indian" class="category-card">
+                        <div class="cat-icon"><i class="fa-solid fa-bowl-rice"></i></div>
+                        <span class="cat-name">Indian</span>
+                    </a>
+                    <a href="/restaurants/?cuisine=Chinese" class="category-card">
+                        <div class="cat-icon"><i class="fa-solid fa-utensils"></i></div>
+                        <span class="cat-name">Chinese</span>
+                    </a>
+                    <a href="/restaurants/?cuisine=Pizza" class="category-card">
+                        <div class="cat-icon"><i class="fa-solid fa-pizza-slice"></i></div>
+                        <span class="cat-name">Pizza</span>
+                    </a>
+                    <a href="/restaurants/?cuisine=Burger" class="category-card">
+                        <div class="cat-icon"><i class="fa-solid fa-burger"></i></div>
+                        <span class="cat-name">Burger</span>
+                    </a>
+                    <a href="/restaurants/?cuisine=Biryani" class="category-card">
+                        <div class="cat-icon"><i class="fa-solid fa-fire-burner"></i></div>
+                        <span class="cat-name">Biryani</span>
+                    </a>
+                    <a href="/restaurants/?cuisine=Cafe" class="category-card">
+                        <div class="cat-icon"><i class="fa-solid fa-mug-hot"></i></div>
+                        <span class="cat-name">Cafe</span>
+                    </a>
+                    <a href="/restaurants/?cuisine=Bakery" class="category-card">
+                        <div class="cat-icon"><i class="fa-solid fa-cake-candles"></i></div>
+                        <span class="cat-name">Bakery</span>
+                    </a>
+                    <a href="/restaurants/?cuisine=Fast%20Food" class="category-card">
+                        <div class="cat-icon"><i class="fa-solid fa-bolt"></i></div>
+                        <span class="cat-name">Fast Food</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dedicated Live Offers & Coupons Section -->
+        <section class="section" id="offers-section" style="padding-top: 10px; background: #FFFBF8;">
+            <div class="container">
+                <div class="section-title-wrap">
+                    <span class="section-subtitle"><i class="fa-solid fa-tags"></i> Live Deals & Promo Codes</span>
+                    <h2 class="section-title">Best Offers & Coupons For You</h2>
+                    <p class="section-desc">Copy any active coupon code below and apply it in your Cart or Checkout for
+                        instant savings.</p>
+                </div>
+
+                <div class="home-offers-grid" id="home-offers-grid">
+                    <!-- Populated dynamically from Firestore via js/restaurants.js -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Top Restaurants & Partner Stores Section -->
+        <section class="section" id="restaurants-section">
+            <div class="container">
+                <div class="section-title-wrap">
+                    <span class="section-subtitle">Partner Restaurants & Stores</span>
+                    <h2 class="section-title">Top Restaurants Delivering Near You</h2>
+                    <p class="section-desc">Order from verified local kitchens with live menus, opening hours, and
+                        location-based delivery.</p>
+                </div>
+
+                <div class="restaurants-grid" id="home-restaurants-grid">
+                    <!-- Populated dynamically from Firestore via js/restaurants.js -->
+                </div>
+
+                <div style="text-align: center; margin-top: 38px;">
+                    <a href="/restaurants/" class="btn btn-primary btn-lg">
+                        <i class="fa-solid fa-store"></i> Explore All Restaurants & Stores
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Popular Items Section -->
+        <section class="section">
+            <div class="container">
+                <div class="section-title-wrap">
+                    <span class="section-subtitle">Our Bestsellers</span>
+                    <h2 class="section-title">Popular Cravings Right Now</h2>
+                    <p class="section-desc">Hand-picked selections that our customers order again and again.</p>
+                </div>
+
+                <div class="food-grid" id="home-popular-grid">
+                    <!-- Loaded dynamically via JS or fallback cards -->
+                </div>
+
+                <div style="text-align: center; margin-top: 45px;">
+                    <a href="/menu/" class="btn btn-secondary btn-lg">
+                        <i class="fa-solid fa-list"></i> View All Menu Items
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Promotional Offer Banner -->
+        <section class="section" style="padding-top: 10px;">
+            <div class="container">
+                <div class="offer-banner">
+                    <div class="offer-grid">
+                        <div>
+                            <span class="offer-tag">Special Welcome Offer</span>
+                            <h2 class="offer-title">Get 20% OFF on Your First Order!</h2>
+                            <p class="offer-desc">
+                                Use promo code <strong
+                                    style="text-decoration: underline; color: #FFF; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 4px;">FOODRUSH20</strong>
+                                at checkout and enjoy savings on your favorite burgers, pizzas, and desserts.
+                            </p>
+                            <a href="/restaurants/" class="btn btn-secondary btn-lg" style="color: #222;">
+                                <i class="fa-solid fa-tag"></i> Order Now & Save
+                            </a>
+                        </div>
+                        <div class="offer-img-box">
+                            <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80"
+                                alt="Special 20% Discount Pizza Offer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Us -->
+        <section class="section">
+            <div class="container">
+                <div class="section-title-wrap">
+                    <span class="section-subtitle">Why FoodRush</span>
+                    <h2 class="section-title">Why Foodies Love Us</h2>
+                    <p class="section-desc">We combine culinary excellence with lightning speed delivery.</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon-box">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+                        <h3 class="feature-title">Fast Delivery</h3>
+                        <p class="feature-desc">Hot, steaming meals delivered to your doorstep in under 30 minutes
+                            guaranteed.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon-box">
+                            <i class="fa-solid fa-leaf"></i>
+                        </div>
+                        <h3 class="feature-title">Fresh Ingredients</h3>
+                        <p class="feature-desc">100% farm-fresh veggies, antibiotic-free meats, and artisanal brioche
+                            buns.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon-box">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+                        <h3 class="feature-title">Best Quality</h3>
+                        <p class="feature-desc">Crafted by award-winning chefs with hygiene and perfection in every
+                            single bite.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon-box">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h3 class="feature-title">Secure Payment</h3>
+                        <p class="feature-desc">Multiple seamless payment options: UPI, Cards, NetBanking, and Cash on
+                            Delivery.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a href="/home/" class="footer-logo">
+                        <i class="fa-solid fa-burger"></i>
+                        <span>Food<strong>Rush</strong></span>
+                    </a>
+                    <p class="footer-desc">
+                        FoodRush delivers restaurant-quality fast food straight to your door. Fresh ingredients,
+                        lightning delivery, and sensational flavors every day.
+                    </p>
+                    <div class="footer-socials">
+                        <a href="/about-contact/" class="social-btn" aria-label="Facebook"><i
+                                class="fa-brands fa-facebook-f"></i></a>
+                        <a href="/about-contact/" class="social-btn" aria-label="Instagram"><i
+                                class="fa-brands fa-instagram"></i></a>
+                        <a href="/about-contact/" class="social-btn" aria-label="Twitter"><i
+                                class="fa-brands fa-x-twitter"></i></a>
+                        <a href="/about-contact/" class="social-btn" aria-label="YouTube"><i
+                                class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="/home/">Home</a></li>
+                        <li><a href="/restaurants/">Partner Restaurants</a></li>
+                        <li><a href="/menu/">Full Menu</a></li>
+                        <li><a href="/about-contact/#about">Our Story</a></li>
+                        <li><a href="/about-contact/#contact">Contact Us</a></li>
+                        <li><a href="/admin/">Admin Dashboard</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Categories</h4>
+                    <ul class="footer-links">
+                        <li><a href="/restaurants/?cuisine=Indian">Indian Restaurants</a></li>
+                        <li><a href="/restaurants/?cuisine=Pizza">Stone-Baked Pizza</a></li>
+                        <li><a href="/restaurants/?cuisine=Burger">Gourmet Burgers</a></li>
+                        <li><a href="/restaurants/?cuisine=Biryani">Royal Biryani</a></li>
+                        <li><a href="/restaurants/?cuisine=Cafe">Cafes & Bakeries</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Contact & Support</h4>
+                    <ul class="footer-links">
+                        <li><i class="fa-solid fa-location-dot" style="color: var(--primary); margin-right: 8px;"></i>
+                            42 Rush Avenue, Food District</li>
+                        <li><i class="fa-solid fa-phone" style="color: var(--primary); margin-right: 8px;"></i> +91
+                            98765 43210</li>
+                        <li><i class="fa-solid fa-envelope" style="color: var(--primary); margin-right: 8px;"></i>
+                            support@foodrush.com</li>
+                        <li><i class="fa-regular fa-clock" style="color: var(--primary); margin-right: 8px;"></i> 10:00
+                            AM - 11:30 PM (Daily)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 FoodRush Express. All Rights Reserved.</p>
+                <p>Designed with ❤️ for Fast Food Lovers</p>
+            </div>
+        </div>
+    </footer>
+
+        <!-- Scripts -->
+    <script src="/js/firebase-config.js?v=2.2"></script>
+    <script type="module" src="/js/firebase-auth.js?v=2.2"></script>
+    <script type="module" src="/js/store-data.js?v=2.2"></script>
+    <script type="module" src="/js/location-ui.js?v=2.2"></script>
+    <script src="/js/products.js?v=2.2"></script>
+    <script src="/js/cart.js?v=2.2"></script>
+    <script src="/js/main.js?v=2.2"></script>
+    <script type="module" src="/js/restaurants.js?v=2.2"></script>
+    <script>
+        // Render popular items on Home page with Restaurant Name & Offer Banner
+        document.addEventListener('DOMContentLoaded', () => {
+            const homePopularGrid = document.getElementById('home-popular-grid');
+            if (homePopularGrid && typeof getPopularProducts === 'function') {
+                const popular = getPopularProducts().slice(0, 6);
+                const fallbackImg = 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80';
+                homePopularGrid.innerHTML = popular.map(product => {
+                    const restName = product.restaurantName || 'FoodRush Signature Kitchen';
+                    const restLink = product.restaurantId ? `/restaurants/?id=${encodeURIComponent(product.restaurantId)}` : '/restaurants/';
+                    const offerBannerText = product.offerText || '20% OFF • Use FOODRUSH20';
+                    return `
+                    <div class="food-card">
+                        <div class="food-img-wrap">
+                            ${product.badge ? `<span class="badge badge-primary card-badge">${product.badge}</span>` : ''}
+                            <a href="/food-details/?id=${product.id}">
+                                <img src="${product.image}" alt="${product.name}" class="food-img" loading="lazy" onerror="this.onerror=null;this.src='${fallbackImg}';">
+                            </a>
+                            <div class="food-card-offer-strip">
+                                <i class="fa-solid fa-tag"></i>
+                                <span>${offerBannerText}</span>
+                            </div>
+                        </div>
+                        <div class="food-card-body">
+                            <div class="food-rest-tag">
+                                <a href="${restLink}" title="View ${restName}">
+                                    <i class="fa-solid fa-store"></i> ${restName}
+                                </a>
+                                <span class="veg-dot-badge ${product.isVeg ? 'veg' : 'nonveg'}">
+                                    ${product.isVeg ? '● Veg' : '▲ Non-Veg'}
+                                </span>
+                            </div>
+                            <div class="food-rating-wrap">
+                                <span class="rating-badge"><i class="fa-solid fa-star"></i> ${product.rating}</span>
+                                <span class="prep-time"><i class="fa-regular fa-clock"></i> ${product.prepTime}</span>
+                            </div>
+                            <h3 class="food-title">
+                                <a href="/food-details/?id=${product.id}">${product.name}</a>
+                            </h3>
+                            <p class="food-desc">${product.description}</p>
+                            <div class="food-card-footer">
+                                <div class="food-price-wrap">
+                                    <span class="current-price">₹${product.price}</span>
+                                    ${product.originalPrice ? `<span class="original-price">₹${product.originalPrice}</span>` : ''}
+                                </div>
+                                <div class="card-btn-group">
+                                    <a href="/food-details/?id=${product.id}" class="btn-card-details">Details</a>
+                                    <button type="button" class="btn-card-add" onclick="addToCart('${product.id}', 1)" title="Add to Cart">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `}).join('');
+            }
+        });
+    </script>
+</body>
+
+</html>

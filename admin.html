@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control Center - FoodRush</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20width=%22100%22%20height=%22100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body style="background: #F1F5F9;">
+
+    <!-- ADMIN SECURITY GATE OVERLAY (Shown while verifying Firebase ID token with Backend Server) -->
+    <div id="admin-auth-gate" style="position: fixed; inset: 0; background: #0F172A; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; color: #fff;">
+        <div id="admin-gate-card" style="background: #1E293B; max-width: 460px; width: 100%; border-radius: 16px; padding: 36px 30px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);">
+            <div style="width: 64px; height: 64px; border-radius: 16px; background: rgba(255, 87, 34, 0.15); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 20px;">
+                <i class="fa-solid fa-shield-halved" id="admin-gate-icon"></i>
+            </div>
+            <h2 id="admin-gate-title" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; color: #fff;">Verifying Admin Credentials...</h2>
+            <p id="admin-gate-desc" style="color: #94A3B8; font-size: 0.92rem; line-height: 1.6; margin-bottom: 24px;">
+                Checking your Firebase Authentication session and server-side administrator permissions.
+            </p>
+            <div id="admin-gate-actions" style="display: none; flex-direction: column; gap: 10px;">
+                <a href="/auth/" class="btn btn-primary btn-block">Sign In with Admin Account</a>
+                <a href="/home/" class="btn btn-outline btn-block" style="border-color: rgba(255,255,255,0.2); color: #E2E8F0;">Return to FoodRush Storefront</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN ADMIN DASHBOARD LAYOUT (Hidden until server-side verification succeeds) -->
+    <div id="admin-dashboard-app" class="admin-layout" style="display: none;">
+
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar" id="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <a href="/home/" class="logo" style="color: #fff;">
+                    <i class="fa-solid fa-burger"></i>
+                    <span>Food<strong>Rush</strong></span>
+                </a>
+                <span class="admin-badge-pill">ADMIN</span>
+            </div>
+
+            <nav class="admin-sidebar-nav">
+                <button type="button" class="admin-nav-btn active" data-tab="overview">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard Overview</span>
+                </button>
+                <button type="button" class="admin-nav-btn" data-tab="restaurants">
+                    <i class="fa-solid fa-store"></i>
+                    <span>Restaurants & Menus</span>
+                </button>
+                <button type="button" class="admin-nav-btn" data-tab="offers">
+                    <i class="fa-solid fa-tags"></i>
+                    <span>Offers & Coupons</span>
+                </button>
+                <button type="button" class="admin-nav-btn" data-tab="locations">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>Delivery Zones & PINs</span>
+                </button>
+            </nav>
+
+            <div class="admin-sidebar-footer">
+                <div style="font-size: 0.78rem; color: #94A3B8; margin-bottom: 10px;">
+                    Signed in as:<br>
+                    <strong id="admin-user-email" style="color: #fff; word-break: break-all;">admin@foodrush.com</strong>
+                </div>
+                <a href="/home/" class="btn btn-outline btn-sm btn-block" style="color: #fff; border-color: rgba(255,255,255,0.2); margin-bottom: 8px;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> View Live Website
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="admin-main-wrapper">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" class="btn btn-outline btn-sm" id="admin-mobile-toggle" style="display: none;">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 id="admin-page-title" style="font-size: 1.35rem; font-weight: 800; margin: 0;">Dashboard Overview</h1>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span id="admin-sync-status" style="font-size: 0.82rem; font-weight: 600; color: #059669; background: #D1FAE5; padding: 6px 12px; border-radius: 20px;">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Firestore Connected
+                    </span>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="openRestaurantModal()">
+                        <i class="fa-solid fa-plus"></i> Add Restaurant
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="openOfferModal()">
+                        <i class="fa-solid fa-ticket"></i> New Coupon
+                    </button>
+                </div>
+            </header>
+
+            <div class="admin-content-body">
+
+                <!-- Stats Summary Row -->
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-icon" style="background: #FFF3EE; color: var(--primary);">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <div>
+                            <div class="admin-stat-label">Total Restaurants</div>
+                            <div class="admin-stat-value" id="stat-total-restaurants">0</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-icon" style="background: #ECFDF5; color: #10B981;">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <div class="admin-stat-label">Active Open Stores</div>
+                            <div class="admin-stat-value" id="stat-active-stores">0</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-icon" style="background: #EFF6FF; color: #3B82F6;">
+                            <i class="fa-solid fa-tags"></i>
+                        </div>
+                        <div>
+                            <div class="admin-stat-label">Active Offers & Coupons</div>
+                            <div class="admin-stat-value" id="stat-active-offers">0</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-icon" style="background: #F5F3FF; color: #8B5CF6;">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div>
+                            <div class="admin-stat-label">Configured PIN Zones</div>
+                            <div class="admin-stat-value" id="stat-total-zones">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 1: OVERVIEW -->
+                <section id="admin-tab-overview" class="admin-tab-panel">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
+                        <div class="admin-panel-card">
+                            <div class="admin-panel-header">
+                                <h3><i class="fa-solid fa-store" style="color: var(--primary);"></i> Recent Partner Restaurants</h3>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="switchAdminTab('restaurants')">Manage All</button>
+                            </div>
+                            <div id="overview-restaurants-list"></div>
+                        </div>
+
+                        <div class="admin-panel-card">
+                            <div class="admin-panel-header">
+                                <h3><i class="fa-solid fa-ticket" style="color: var(--primary);"></i> Active Promotional Coupons</h3>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="switchAdminTab('offers')">Manage All</button>
+                            </div>
+                            <div id="overview-offers-list"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 2: RESTAURANT & MENU MANAGEMENT -->
+                <section id="admin-tab-restaurants" class="admin-tab-panel" style="display: none;">
+                    <div class="admin-panel-card">
+                        <div class="admin-panel-header" style="flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1;">
+                                <input type="text" id="admin-rest-search" class="form-control" placeholder="Search by restaurant name, city, PIN, or cuisine..." style="max-width: 300px;">
+                                <select id="admin-rest-cuisine-filter" class="form-control" style="width: auto;">
+                                    <option value="all">All Cuisines</option>
+                                    <option value="Indian">Indian</option>
+                                    <option value="Chinese">Chinese</option>
+                                    <option value="Pizza">Pizza</option>
+                                    <option value="Burger">Burger</option>
+                                    <option value="Biryani">Biryani</option>
+                                    <option value="Cafe">Cafe</option>
+                                    <option value="Bakery">Bakery</option>
+                                    <option value="Fast Food">Fast Food</option>
+                                </select>
+                                <select id="admin-rest-sort" class="form-control" style="width: auto;">
+                                    <option value="name">Sort: Name (A-Z)</option>
+                                    <option value="rating">Sort: Rating (High-Low)</option>
+                                    <option value="fee">Sort: Delivery Fee</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="openRestaurantModal()">
+                                <i class="fa-solid fa-plus"></i> Add New Restaurant
+                            </button>
+                        </div>
+
+                        <div class="admin-table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Restaurant</th>
+                                        <th>Cuisines</th>
+                                        <th>Location & Hours</th>
+                                        <th>Rating</th>
+                                        <th>Delivery Rules</th>
+                                        <th>Menu Items</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-restaurants-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 3: OFFERS & COUPONS MANAGEMENT -->
+                <section id="admin-tab-offers" class="admin-tab-panel" style="display: none;">
+                    <div class="admin-panel-card">
+                        <div class="admin-panel-header" style="flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; gap: 10px; flex: 1;">
+                                <input type="text" id="admin-offer-search" class="form-control" placeholder="Search coupon code or title..." style="max-width: 280px;">
+                                <select id="admin-offer-status-filter" class="form-control" style="width: auto;">
+                                    <option value="all">All Status</option>
+                                    <option value="active">Active Only</option>
+                                    <option value="inactive">Deactivated</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="openOfferModal()">
+                                <i class="fa-solid fa-plus"></i> Create New Offer / Coupon
+                            </button>
+                        </div>
+
+                        <div class="admin-table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Coupon Code</th>
+                                        <th>Title & Discount</th>
+                                        <th>Min Order / Max Cap</th>
+                                        <th>Applicable Store</th>
+                                        <th>Validity Dates</th>
+                                        <th>Usage Limit</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-offers-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 4: LOCATION & DELIVERY ZONE MANAGEMENT -->
+                <section id="admin-tab-locations" class="admin-tab-panel" style="display: none;">
+                    <div class="admin-panel-card">
+                        <div class="admin-panel-header">
+                            <div>
+                                <h3 style="margin: 0;">Restaurant Service Areas, PIN Codes & Delivery Radius</h3>
+                                <p style="color: var(--text-muted); font-size: 0.85rem; margin: 4px 0 0;">
+                                    Configure serviceable PIN codes, GPS coordinates, delivery radius (km), base delivery fees, and estimated delivery time per restaurant.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="admin-table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Restaurant</th>
+                                        <th>Store Coordinates (Lat, Lng)</th>
+                                        <th>Serviceable PIN Codes (comma-separated)</th>
+                                        <th>Max Radius (km)</th>
+                                        <th>Delivery Fee ($)</th>
+                                        <th>Free Deliv Above ($)</th>
+                                        <th>Est. Time</th>
+                                        <th>Save</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-locations-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: ADD / EDIT RESTAURANT & COMPLETE MENU -->
+    <div id="admin-restaurant-modal" class="location-modal-backdrop" style="display: none;">
+        <div class="location-modal-card" style="max-width: 820px;">
+            <div class="location-modal-header">
+                <h3 id="rest-modal-title"><i class="fa-solid fa-store" style="color: var(--primary);"></i> Add Restaurant</h3>
+                <button type="button" class="location-modal-close" onclick="closeRestaurantModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="location-modal-body">
+                <form id="admin-restaurant-form">
+                    <input type="hidden" id="rest-form-id">
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Restaurant Name *</label>
+                            <input type="text" id="rest-form-name" class="form-control" required placeholder="e.g. Spice Symphony">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cuisines (comma-separated) *</label>
+                            <input type="text" id="rest-form-cuisines" class="form-control" required placeholder="Indian, Biryani, Fast Food">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Contact Phone *</label>
+                            <input type="text" id="rest-form-phone" class="form-control" required placeholder="+91 98765 43210">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description *</label>
+                        <input type="text" id="rest-form-desc" class="form-control" required placeholder="Authentic flavours and fresh ingredients...">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Street Address *</label>
+                            <input type="text" id="rest-form-address" class="form-control" required placeholder="14 Connaught Outer Circle">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Area / Locality *</label>
+                            <input type="text" id="rest-form-area" class="form-control" required placeholder="Connaught Place">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">City *</label>
+                            <input type="text" id="rest-form-city" class="form-control" required placeholder="New Delhi">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Store PIN Code *</label>
+                            <input type="text" id="rest-form-pincode" class="form-control" required placeholder="110001">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Latitude</label>
+                            <input type="number" step="any" id="rest-form-lat" class="form-control" placeholder="28.6315">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Longitude</label>
+                            <input type="number" step="any" id="rest-form-lng" class="form-control" placeholder="77.2167">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Opening Time</label>
+                            <input type="time" id="rest-form-open" class="form-control" value="09:00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Closing Time</label>
+                            <input type="time" id="rest-form-close" class="form-control" value="23:30">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Delivery Radius (km)</label>
+                            <input type="number" step="0.5" id="rest-form-radius" class="form-control" value="12">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Delivery Fee ($)</label>
+                            <input type="number" step="0.01" id="rest-form-fee" class="form-control" value="2.49">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Est. Delivery Time</label>
+                            <input type="text" id="rest-form-time" class="form-control" value="25-35 mins">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Rating (1-5)</label>
+                            <input type="number" step="0.1" min="1" max="5" id="rest-form-rating" class="form-control" value="4.7">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Serviceable PIN Codes (comma-separated) *</label>
+                        <input type="text" id="rest-form-service-pins" class="form-control" required placeholder="110001, 110002, 110003, 110005">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Logo URL or Upload Image</label>
+                            <input type="text" id="rest-form-logo" class="form-control" placeholder="https://...">
+                            <input type="file" id="rest-form-logo-file" accept="image/*" style="margin-top: 6px; font-size: 0.8rem;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cover Image URL or Upload Image</label>
+                            <input type="text" id="rest-form-cover" class="form-control" placeholder="https://...">
+                            <input type="file" id="rest-form-cover-file" accept="image/*" style="margin-top: 6px; font-size: 0.8rem;">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 16px; align-items: center; margin-bottom: 16px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Promotional Offer Banner Text</label>
+                            <input type="text" id="rest-form-banner" class="form-control" placeholder="e.g. 30% OFF up to $8 • Use SPICE30">
+                        </div>
+                        <label style="display: flex; align-items: center; gap: 6px; font-weight: 700; cursor: pointer; padding-top: 18px;">
+                            <input type="checkbox" id="rest-form-open-check" checked> Currently Open
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; font-weight: 700; cursor: pointer; padding-top: 18px;">
+                            <input type="checkbox" id="rest-form-active-check" checked> Store Active
+                        </label>
+                    </div>
+
+                    <!-- MENU ITEMS BUILDER -->
+                    <div style="border-top: 2px solid var(--border-light); padding-top: 16px; margin-top: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h4 style="margin: 0; font-size: 1.05rem;"><i class="fa-solid fa-utensils" style="color: var(--primary);"></i> Restaurant Menu Items</h4>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="addMenuItemRow()">
+                                <i class="fa-solid fa-plus"></i> Add Dish
+                            </button>
+                        </div>
+                        <div id="admin-menu-items-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-light);">
+                        <button type="button" class="btn btn-outline" onclick="closeRestaurantModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="rest-save-btn">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Restaurant & Menu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ADD / EDIT OFFER & COUPON -->
+    <div id="admin-offer-modal" class="location-modal-backdrop" style="display: none;">
+        <div class="location-modal-card" style="max-width: 580px;">
+            <div class="location-modal-header">
+                <h3 id="offer-modal-title"><i class="fa-solid fa-tags" style="color: var(--primary);"></i> Create Offer / Coupon</h3>
+                <button type="button" class="location-modal-close" onclick="closeOfferModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="location-modal-body">
+                <form id="admin-offer-form">
+                    <input type="hidden" id="offer-form-id">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Coupon Code *</label>
+                            <input type="text" id="offer-form-code" class="form-control" required placeholder="e.g. WELCOME40" style="text-transform: uppercase; font-weight: 700;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Discount Type *</label>
+                            <select id="offer-form-type" class="form-control" required>
+                                <option value="percentage">Percentage Discount (%)</option>
+                                <option value="flat">Flat Discount ($)</option>
+                                <option value="first_order">First-Order Discount ($)</option>
+                                <option value="free_delivery">Free Delivery Coupon</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Offer Title *</label>
+                        <input type="text" id="offer-form-title" class="form-control" required placeholder="e.g. 20% OFF on All Orders">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Offer Description *</label>
+                        <input type="text" id="offer-form-desc" class="form-control" required placeholder="Get 20% instant discount up to $10 on orders above $15.">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Discount Value *</label>
+                            <input type="number" step="0.01" id="offer-form-value" class="form-control" required placeholder="20">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Min Order ($)</label>
+                            <input type="number" step="0.01" id="offer-form-min" class="form-control" value="15">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max Discount ($)</label>
+                            <input type="number" step="0.01" id="offer-form-max" class="form-control" value="10">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Applicable Restaurant</label>
+                            <select id="offer-form-rest" class="form-control">
+                                <option value="ALL">All Restaurants</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total Usage Limit</label>
+                            <input type="number" id="offer-form-limit" class="form-control" value="500">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Start Date *</label>
+                            <input type="date" id="offer-form-start" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expiry Date *</label>
+                            <input type="date" id="offer-form-expiry" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 700; cursor: pointer; margin-top: 8px;">
+                        <input type="checkbox" id="offer-form-active" checked> Offer Active Immediately
+                    </label>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-light);">
+                        <button type="button" class="btn btn-outline" onclick="closeOfferModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-check"></i> Save Offer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+        <!-- Scripts -->
+    <script src="/js/firebase-config.js?v=2.2"></script>
+    <script type="module" src="/js/firebase-auth.js?v=2.2"></script>
+    <script type="module" src="/js/store-data.js?v=2.2"></script>
+    <script type="module" src="/js/location-ui.js?v=2.2"></script>
+    <script src="/js/products.js?v=2.2"></script>
+    <script src="/js/cart.js?v=2.2"></script>
+    <script src="/js/main.js?v=2.2"></script>
+    <script type="module" src="/js/admin.js?v=2.2"></script>
+    </body>
+</html>

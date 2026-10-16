@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Our Menu - FoodRush</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20width=%22100%22%20height=%22100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+    <!-- Header & Sticky Navbar -->
+    <header class="site-header">
+        <div class="container navbar">
+            <a href="/home/" class="logo">
+                <i class="fa-solid fa-burger"></i>
+                <span>Food<strong>Rush</strong></span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="/home/" class="nav-item">Home</a>
+                <a href="/restaurants/" class="nav-item">Restaurants</a>
+                <a href="/menu/" class="nav-item active">Menu</a>
+                <a href="/about-contact/#about" class="nav-item">About</a>
+                <a href="/about-contact/#contact" class="nav-item">Contact</a>
+            </nav>
+
+            <div class="nav-actions">
+                <div class="cart-btn-wrap">
+                    <a href="/cart/" class="cart-icon-btn" aria-label="Shopping Cart">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+
+                <div class="auth-nav-container">
+                    <a href="/auth/" class="btn btn-primary user-nav-btn">
+                        <i class="fa-regular fa-user"></i>
+                        <span>Login</span>
+                    </a>
+                </div>
+
+                <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle navigation menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <aside class="mobile-nav-drawer" id="mobile-nav-drawer">
+        <div class="drawer-header">
+            <a href="/home/" class="logo">
+                <i class="fa-solid fa-burger"></i>
+                <span>Food<strong>Rush</strong></span>
+            </a>
+            <button class="drawer-close" id="drawer-close-btn" aria-label="Close drawer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="mobile-links">
+            <a href="/home/" class="mobile-nav-item"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/restaurants/" class="mobile-nav-item"><i class="fa-solid fa-store"></i> Restaurants</a>
+            <a href="/menu/" class="mobile-nav-item active"><i class="fa-solid fa-utensils"></i> Menu</a>
+            <a href="/about-contact/#about" class="mobile-nav-item"><i class="fa-solid fa-circle-info"></i> About Us</a>
+            <a href="/about-contact/#contact" class="mobile-nav-item"><i class="fa-solid fa-envelope"></i> Contact</a>
+            <a href="/cart/" class="mobile-nav-item"><i class="fa-solid fa-bag-shopping"></i> My Cart</a>
+            <a href="/auth/" class="mobile-nav-item"><i class="fa-solid fa-user"></i> Account</a>
+        </div>
+        <div class="drawer-footer">
+            <a href="/cart/" class="btn btn-primary btn-block">Go To Cart</a>
+        </div>
+    </aside>
+
+    <main class="section">
+        <div class="container">
+            <!-- Header Title -->
+            <div class="section-title-wrap">
+                <span class="section-subtitle">FoodRush Catalog</span>
+                <h1 class="section-title">Explore Our Full Menu</h1>
+                <p class="section-desc">Search your favorite dishes or filter by category & restaurant for fresh, sizzling fast food prepared on order.</p>
+            </div>
+
+            <!-- Search, Filter & Sort Controls -->
+            <div class="menu-controls">
+                <div class="menu-search-row">
+                    <div class="search-input-wrap">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="menu-search-input" class="search-input" placeholder="Search dish name (e.g. Cheeseburger, Pizza, Biryani) or restaurant...">
+                    </div>
+
+                    <div class="menu-selects-group">
+                        <select id="menu-restaurant-filter" class="sort-select" aria-label="Filter by Restaurant">
+                            <option value="all">🏪 All Restaurants</option>
+                        </select>
+
+                        <select id="menu-sort-select" class="sort-select" aria-label="Sort products">
+                            <option value="default">Sort by: Recommended</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="rating">Highest Rated</option>
+                        </select>
+                    </div>
+
+                    <div class="menu-toggles-group">
+                        <label class="menu-toggle-pill">
+                            <input type="checkbox" id="menu-veg-only-check" style="accent-color: #10B981;">
+                            <span style="color: #10B981;">●</span> Veg Only
+                        </label>
+
+                        <label class="menu-toggle-pill">
+                            <input type="checkbox" id="menu-offers-only-check" style="accent-color: var(--primary);">
+                            <i class="fa-solid fa-tag" style="color: var(--primary);"></i> With Offers
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Category Pill Buttons -->
+                <div class="menu-filter-pills">
+                    <button type="button" class="filter-pill active" data-category="all">
+                        <i class="fa-solid fa-border-all"></i> All Items
+                    </button>
+                    <button type="button" class="filter-pill" data-category="burgers">
+                        <i class="fa-solid fa-burger"></i> Burgers
+                    </button>
+                    <button type="button" class="filter-pill" data-category="pizza">
+                        <i class="fa-solid fa-pizza-slice"></i> Pizza
+                    </button>
+                    <button type="button" class="filter-pill" data-category="chicken">
+                        <i class="fa-solid fa-drumstick-bite"></i> Chicken
+                    </button>
+                    <button type="button" class="filter-pill" data-category="fries">
+                        <i class="fa-solid fa-fire"></i> Fries
+                    </button>
+                    <button type="button" class="filter-pill" data-category="sandwich">
+                        <i class="fa-solid fa-bread-slice"></i> Sandwich
+                    </button>
+                    <button type="button" class="filter-pill" data-category="indian">
+                        <i class="fa-solid fa-bowl-rice"></i> Indian
+                    </button>
+                    <button type="button" class="filter-pill" data-category="biryani">
+                        <i class="fa-solid fa-fire-burner"></i> Biryani
+                    </button>
+                    <button type="button" class="filter-pill" data-category="chinese">
+                        <i class="fa-solid fa-utensils"></i> Chinese
+                    </button>
+                    <button type="button" class="filter-pill" data-category="drinks">
+                        <i class="fa-solid fa-mug-hot"></i> Drinks & Cafe
+                    </button>
+                    <button type="button" class="filter-pill" data-category="desserts">
+                        <i class="fa-solid fa-ice-cream"></i> Desserts & Bakery
+                    </button>
+                </div>
+            </div>
+
+            <!-- Items Count Indicator -->
+            <div style="margin-bottom: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;">
+                <div style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600;" id="menu-items-count">
+                    Loading menu...
+                </div>
+                <button type="button" id="menu-reset-btn" class="btn btn-outline btn-sm" onclick="resetMenuFilters()" style="display: none;">
+                    <i class="fa-solid fa-rotate-left"></i> Clear Filters
+                </button>
+            </div>
+
+            <!-- Dynamic Food Cards Grid -->
+            <div class="food-grid" id="menu-food-grid">
+                <!-- Injected by js/menu.js -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a href="/home/" class="footer-logo">
+                        <i class="fa-solid fa-burger"></i>
+                        <span>Food<strong>Rush</strong></span>
+                    </a>
+                    <p class="footer-desc">
+                        FoodRush delivers restaurant-quality fast food straight to your door. Fresh ingredients, lightning delivery, and sensational flavors every day.
+                    </p>
+                    <div class="footer-socials">
+                        <a href="/about-contact/" class="social-btn" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="/about-contact/" class="social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="/about-contact/" class="social-btn" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="/about-contact/" class="social-btn" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="/home/">Home</a></li>
+                        <li><a href="/menu/">Full Menu</a></li>
+                        <li><a href="/about-contact/#about">Our Story</a></li>
+                        <li><a href="/about-contact/#contact">Contact Us</a></li>
+                        <li><a href="/auth/">My Account</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Categories</h4>
+                    <ul class="footer-links">
+                        <li><a href="/menu/?category=burgers">Gourmet Burgers</a></li>
+                        <li><a href="/menu/?category=pizza">Stone-Baked Pizza</a></li>
+                        <li><a href="/menu/?category=chicken">Crispy Chicken</a></li>
+                        <li><a href="/menu/?category=fries">Loaded Fries</a></li>
+                        <li><a href="/menu/?category=drinks">Milkshakes & Drinks</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Contact & Support</h4>
+                    <ul class="footer-links">
+                        <li><i class="fa-solid fa-location-dot" style="color: var(--primary); margin-right: 8px;"></i> 42 Rush Avenue, Food District</li>
+                        <li><i class="fa-solid fa-phone" style="color: var(--primary); margin-right: 8px;"></i> +91 98765 43210</li>
+                        <li><i class="fa-solid fa-envelope" style="color: var(--primary); margin-right: 8px;"></i> support@foodrush.com</li>
+                        <li><i class="fa-regular fa-clock" style="color: var(--primary); margin-right: 8px;"></i> 10:00 AM - 11:30 PM (Daily)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 FoodRush Express. All Rights Reserved.</p>
+                <p>Designed with ❤️ for Fast Food Lovers</p>
+            </div>
+        </div>
+    </footer>
+
+        <!-- Scripts -->
+    <script src="/js/firebase-config.js?v=2.2"></script>
+    <script type="module" src="/js/firebase-auth.js?v=2.2"></script>
+    <script type="module" src="/js/store-data.js?v=2.2"></script>
+    <script type="module" src="/js/location-ui.js?v=2.2"></script>
+    <script src="/js/products.js?v=2.2"></script>
+    <script src="/js/cart.js?v=2.2"></script>
+    <script src="/js/main.js?v=2.2"></script>
+    <script src="/js/menu.js?v=2.2"></script>
+    </body>
+</html>

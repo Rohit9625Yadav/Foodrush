@@ -1,0 +1,48 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: Check if the user is signed in via Firebase Auth
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Helper: Check if the authenticated user is an authorized FoodRush Administrator
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.admin == true ||
+        request.auth.token.email == 'rohit09ydv@gmail.com' ||
+        request.auth.token.email == 'admin@foodrush.com'
+      );
+    }
+
+    // 1. Restaurants & Menus Collection
+    // Publicly readable so customers can browse stores & menus; only Admin can add/edit/delete
+    match /restaurants/{restaurantId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 2. Offers & Coupons Collection
+    // Publicly readable so customers can view & validate active offers; only Admin can create/edit/delete
+    match /offers/{offerId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 3. Customer Saved Delivery Addresses Collection
+    // Users can only read and write their own saved delivery addresses
+    match /user_addresses/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // 4. Orders Collection
+    // Authenticated users can create orders for themselves and read their own orders; Admin can read/update all
+    match /orders/{orderId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update, delete: if isAdmin();
+    }
+  }
+}

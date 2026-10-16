@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout - FoodRush</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20width=%22100%22%20height=%22100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+    <!-- Header & Sticky Navbar -->
+    <header class="site-header">
+        <div class="container navbar">
+            <a href="/home/" class="logo">
+                <i class="fa-solid fa-burger"></i>
+                <span>Food<strong>Rush</strong></span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="/home/" class="nav-item">Home</a>
+                <a href="/restaurants/" class="nav-item">Restaurants</a>
+                <a href="/menu/" class="nav-item">Menu</a>
+                <a href="/about-contact/#about" class="nav-item">About</a>
+                <a href="/about-contact/#contact" class="nav-item">Contact</a>
+            </nav>
+
+            <div class="nav-actions">
+                <div class="cart-btn-wrap">
+                    <a href="/cart/" class="cart-icon-btn" aria-label="Shopping Cart">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+
+                <div class="auth-nav-container">
+                    <a href="/auth/" class="btn btn-primary user-nav-btn">
+                        <i class="fa-regular fa-user"></i>
+                        <span>Login</span>
+                    </a>
+                </div>
+
+                <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle navigation menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <aside class="mobile-nav-drawer" id="mobile-nav-drawer">
+        <div class="drawer-header">
+            <a href="/home/" class="logo">
+                <i class="fa-solid fa-burger"></i>
+                <span>Food<strong>Rush</strong></span>
+            </a>
+            <button class="drawer-close" id="drawer-close-btn" aria-label="Close drawer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="mobile-links">
+            <a href="/home/" class="mobile-nav-item"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/menu/" class="mobile-nav-item"><i class="fa-solid fa-utensils"></i> Menu</a>
+            <a href="/about-contact/#about" class="mobile-nav-item"><i class="fa-solid fa-circle-info"></i> About Us</a>
+            <a href="/about-contact/#contact" class="mobile-nav-item"><i class="fa-solid fa-envelope"></i> Contact</a>
+            <a href="/cart/" class="mobile-nav-item"><i class="fa-solid fa-bag-shopping"></i> My Cart</a>
+            <a href="/auth/" class="mobile-nav-item"><i class="fa-solid fa-user"></i> Account</a>
+        </div>
+    </aside>
+
+    <main class="section">
+        <div class="container">
+            <div class="section-title-wrap" style="text-align: left; margin-bottom: 30px;">
+                <span class="section-subtitle">Final Step</span>
+                <h1 class="section-title">Delivery & Checkout</h1>
+            </div>
+
+            <form id="checkout-form" novalidate>
+                <div class="checkout-layout">
+                    <!-- Left Column: Form Fields -->
+                    <div>
+                        <!-- Customer Delivery Information -->
+                        <div class="checkout-box">
+                            <h2 class="box-title">
+                                <i class="fa-solid fa-location-dot"></i> 1. Delivery Details
+                            </h2>
+                            <div class="form-grid">
+                                <div class="form-group col-span-2">
+                                    <label for="full-name" class="form-label">Full Name *</label>
+                                    <input type="text" id="full-name" class="form-control" placeholder="e.g. John Doe" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email Address *</label>
+                                    <input type="email" id="email" class="form-control" placeholder="e.g. john@example.com" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="phone" class="form-label">Phone Number *</label>
+                                    <input type="tel" id="phone" class="form-control" placeholder="10-digit mobile number" required>
+                                </div>
+
+                                <div class="form-group col-span-2">
+                                    <label for="address" class="form-label">Delivery Address / House No. *</label>
+                                    <input type="text" id="address" class="form-control" placeholder="Street name, building, apartment flat" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="city" class="form-label">City *</label>
+                                    <input type="text" id="city" class="form-control" placeholder="e.g. Mumbai" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="state" class="form-label">State *</label>
+                                    <input type="text" id="state" class="form-control" placeholder="e.g. Maharashtra" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="pincode" class="form-label">Pincode *</label>
+                                    <input type="text" id="pincode" class="form-control" placeholder="6-digit pincode" maxlength="6" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Speed Option -->
+                        <div class="checkout-box">
+                            <h2 class="box-title">
+                                <i class="fa-solid fa-truck-fast"></i> 2. Delivery Speed
+                            </h2>
+                            <div class="delivery-options-grid">
+                                <label class="delivery-radio-card active">
+                                    <input type="radio" name="delivery-speed" value="standard" checked>
+                                    <div>
+                                        <strong style="display: block; font-size: 0.95rem;">Standard Delivery</strong>
+                                        <span style="color: var(--text-muted); font-size: 0.8rem;">35 - 45 mins</span>
+                                    </div>
+                                </label>
+
+                                <label class="delivery-radio-card">
+                                    <input type="radio" name="delivery-speed" value="express">
+                                    <div>
+                                        <strong style="display: block; font-size: 0.95rem;">⚡ Express Priority (+₹40)</strong>
+                                        <span style="color: var(--text-muted); font-size: 0.8rem;">15 - 25 mins</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method (Demo) -->
+                        <div class="checkout-box">
+                            <h2 class="box-title">
+                                <i class="fa-solid fa-credit-card"></i> 3. Payment Method (Demo)
+                            </h2>
+                            <div class="payment-tabs">
+                                <button type="button" class="payment-tab active" data-payment="cod">
+                                    <i class="fa-solid fa-money-bill-wave"></i>
+                                    <span>Cash on Delivery</span>
+                                </button>
+                                <button type="button" class="payment-tab" data-payment="upi">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                    <span>UPI / QR</span>
+                                </button>
+                                <button type="button" class="payment-tab" data-payment="card">
+                                    <i class="fa-regular fa-credit-card"></i>
+                                    <span>Card (Debit/Credit)</span>
+                                </button>
+                            </div>
+
+                            <!-- COD Pane -->
+                            <div class="payment-content-pane active" id="payment-pane-cod">
+                                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                                    <i class="fa-solid fa-circle-info" style="color: var(--primary);"></i> Pay with cash or UPI to the delivery partner when your hot food arrives at your door.
+                                </p>
+                            </div>
+
+                            <!-- UPI Pane -->
+                            <div class="payment-content-pane" id="payment-pane-upi">
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    <label for="upi-id" class="form-label">Enter your UPI ID (GooglePay / PhonePe / Paytm)</label>
+                                    <input type="text" id="upi-id" class="form-control" placeholder="e.g. mobileNumber@upi or name@okaxis">
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">A simulated payment request will be sent.</span>
+                            </div>
+
+                            <!-- Card Pane -->
+                            <div class="payment-content-pane" id="payment-pane-card">
+                                <div class="form-grid">
+                                    <div class="form-group col-span-2">
+                                        <label for="card-number" class="form-label">Card Number</label>
+                                        <input type="text" id="card-number" class="form-control" placeholder="4532 •••• •••• 8920" maxlength="19">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="card-expiry" class="form-label">Expiry Date</label>
+                                        <input type="text" id="card-expiry" class="form-control" placeholder="MM/YY" maxlength="5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="card-cvv" class="form-label">CVV</label>
+                                        <input type="password" id="card-cvv" class="form-control" placeholder="•••" maxlength="3">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Order Summary & Place Order CTA -->
+                    <div>
+                        <div class="checkout-box" id="checkout-items-summary">
+                            <!-- Injected by js/checkout.js -->
+                        </div>
+
+                        <button type="submit" id="place-order-btn" class="btn btn-primary btn-block btn-lg" style="margin-top: 15px; font-size: 1.15rem; padding: 16px;">
+                            <i class="fa-solid fa-lock"></i> Place Order
+                        </button>
+
+                        <p style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 14px;">
+                            <i class="fa-solid fa-shield-halved" style="color: var(--success);"></i> 100% Safe & Secure Order Process
+                        </p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Order Success Modal -->
+    <div class="modal-backdrop" id="order-success-modal">
+        <div class="order-modal-card">
+            <div class="modal-check-icon">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 8px;">Order Placed Successfully!</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+                Thank you, <strong id="modal-customer-name">Valued Customer</strong>! Your delicious meal is being prepared with love and will arrive shortly.
+            </p>
+
+            <div>
+                <span class="modal-order-id">Order ID: <span id="modal-order-id-val">#FR123456</span></span>
+            </div>
+
+            <div style="background: var(--bg-color); border-radius: var(--radius-sm); padding: 14px; margin: 16px 0; font-size: 0.88rem; text-align: left;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="color: var(--text-muted);">Estimated Delivery:</span>
+                    <strong id="modal-est-time">30-35 mins</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Delivery Status:</span>
+                    <span style="color: var(--success); font-weight: 700;">Kitchen Preparing 👨‍🍳</span>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button type="button" class="btn btn-primary btn-block" onclick="closeOrderModal()">
+                    Back to Home
+                </button>
+                <a href="/menu/" class="btn btn-outline btn-block">
+                    Explore More
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a href="/home/" class="footer-logo">
+                        <i class="fa-solid fa-burger"></i>
+                        <span>Food<strong>Rush</strong></span>
+                    </a>
+                    <p class="footer-desc">
+                        FoodRush delivers restaurant-quality fast food straight to your door. Fresh ingredients, lightning delivery, and sensational flavors every day.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="/home/">Home</a></li>
+                        <li><a href="/menu/">Full Menu</a></li>
+                        <li><a href="/about-contact/#about">Our Story</a></li>
+                        <li><a href="/about-contact/#contact">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Customer Care</h4>
+                    <ul class="footer-links">
+                        <li><i class="fa-solid fa-phone" style="color: var(--primary); margin-right: 8px;"></i> +91 98765 43210</li>
+                        <li><i class="fa-solid fa-envelope" style="color: var(--primary); margin-right: 8px;"></i> support@foodrush.com</li>
+                        <li><i class="fa-regular fa-clock" style="color: var(--primary); margin-right: 8px;"></i> 10:00 AM - 11:30 PM (Daily)</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Satisfaction Guarantee</h4>
+                    <p style="font-size: 0.88rem; color: #A0A0A0; line-height: 1.5;">
+                        Hot food or money back guarantee. Contact our 24/7 rush support helpline for any order assistance.
+                    </p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 FoodRush Express. All Rights Reserved.</p>
+                <p>Designed with ❤️ for Fast Food Lovers</p>
+            </div>
+        </div>
+    </footer>
+
+        <!-- Scripts -->
+    <script src="/js/firebase-config.js?v=2.2"></script>
+    <script type="module" src="/js/firebase-auth.js?v=2.2"></script>
+    <script type="module" src="/js/store-data.js?v=2.2"></script>
+    <script type="module" src="/js/location-ui.js?v=2.2"></script>
+    <script src="/js/products.js?v=2.2"></script>
+    <script src="/js/cart.js?v=2.2"></script>
+    <script src="/js/main.js?v=2.2"></script>
+    <script src="/js/checkout.js?v=2.2"></script>
+    </body>
+</html>
