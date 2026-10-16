@@ -431,12 +431,17 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Start Server
-app.listen(PORT, async () => {
-    console.log(`====================================================`);
-    console.log(`🚀 FoodRush Full-Stack Server running at: http://localhost:${PORT}`);
-    console.log(`🍔 Frontend live at: http://localhost:${PORT}/index.html`);
-    console.log(`🔐 Real Auth API at: http://localhost:${PORT}/api/auth/`);
-    console.log(`====================================================`);
-    await getTransporter();
-});
+// Start Server if run directly (Local development & Render)
+if (!process.env.VERCEL) {
+    app.listen(PORT, async () => {
+        console.log(`====================================================`);
+        console.log(`🚀 FoodRush Full-Stack Server running at: http://localhost:${PORT}`);
+        console.log(`🍔 Frontend live at: http://localhost:${PORT}/index.html`);
+        console.log(`🔐 Real Auth API at: http://localhost:${PORT}/api/auth/`);
+        console.log(`====================================================`);
+        await getTransporter();
+    });
+}
+
+// Export for Vercel Serverless Functions
+module.exports = app;
