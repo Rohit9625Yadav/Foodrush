@@ -4,6 +4,7 @@
   "description": "FoodRush Fast Food Delivery Platform with Real Authentication and OTP Service",
   "main": "server.js",
   "scripts": {
+    "build": "node setup-public.js",
     "start": "node server.js"
   },
   "dependencies": {
