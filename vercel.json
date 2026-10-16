@@ -1,15 +1,22 @@
 {
-  "version": 2,
-  "builds": [
+  "cleanUrls": true,
+  "trailingSlash": true,
+  "redirects": [
     {
-      "src": "server.js",
-      "use": "@vercel/node"
+      "source": "/",
+      "destination": "/home/",
+      "permanent": false
+    },
+    {
+      "source": "/index",
+      "destination": "/home/",
+      "permanent": false
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "server.js"
+      "source": "/api/(.*)",
+      "destination": "/api"
     }
   ]
 }
