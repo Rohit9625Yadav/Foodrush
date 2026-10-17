@@ -314,6 +314,15 @@ button {
 
 .cart-btn-wrap {
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-nav-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .cart-icon-btn {

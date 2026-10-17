@@ -352,44 +352,171 @@
     }
 }
 
-/* --- 4. Mobile Phones (max-width: 640px) --- */
-@media (max-width: 640px) {
-    /* Two-row Swiggy/Zomato-style Mobile Header so Logo, Actions & Location Bar never collide */
+/* --- 4. Mobile Phones & Tablets (max-width: 768px) --- */
+@media (max-width: 768px) {
+    /* Two-row Swiggy/Zomato-style Mobile Header so Logo & Actions stay perfectly aligned on row 1, Location Bar on row 2 */
     .site-header,
     .site-header.scrolled {
         height: auto;
-        min-height: 68px;
-        padding: 10px 0;
+        min-height: auto;
+        padding: 8px 0 10px;
     }
 
     .navbar {
-        flex-wrap: wrap;
-        gap: 8px;
+        display: grid !important;
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+            "logo actions"
+            "location location";
+        align-items: center;
+        row-gap: 8px;
+        column-gap: 10px;
+        width: 100%;
+        height: auto;
     }
 
     .logo {
-        font-size: 1.4rem;
-        order: 1;
+        grid-area: logo;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 1.35rem;
+        font-weight: 800;
+        white-space: nowrap;
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+
+    .logo span {
+        display: inline-flex;
+        align-items: center;
+        line-height: 1;
     }
 
     .logo i {
-        font-size: 1.5rem;
+        font-size: 1.45rem;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
     }
 
     .nav-actions {
-        order: 2;
+        grid-area: actions;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
         gap: 8px;
-        margin-left: auto;
+        margin: 0;
+        padding: 0;
+    }
+
+    .cart-btn-wrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .cart-icon-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1.05rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+        margin: 0;
+    }
+
+    .cart-count {
+        width: 18px;
+        height: 18px;
+        font-size: 0.68rem;
+        top: -3px;
+        right: -3px;
+    }
+
+    .auth-nav-container {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .user-nav-btn {
+        height: 38px;
+        padding: 0 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: var(--radius-full);
+        white-space: nowrap;
+        flex-shrink: 0;
+        box-sizing: border-box;
+        margin: 0;
+    }
+
+    .user-profile-badge {
+        height: 38px;
+        padding: 0 10px 0 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border-radius: var(--radius-full);
+        flex-shrink: 0;
+        box-sizing: border-box;
+        margin: 0;
+    }
+
+    .user-profile-badge span {
+        max-width: 75px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.82rem !important;
+    }
+
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 0.82rem;
+        flex-shrink: 0;
+    }
+
+    .hamburger-btn {
+        width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        padding: 0;
+        margin: 0;
+        background: transparent;
+        border: none;
+        color: var(--text-main);
+        border-radius: var(--radius-sm);
+        flex-shrink: 0;
+        box-sizing: border-box;
     }
 
     .header-location-pill {
-        order: 3;
+        grid-area: location;
         width: 100%;
         max-width: 100%;
-        margin: 2px 0 0;
+        margin: 0;
         padding: 7px 14px;
         justify-content: flex-start;
         border-radius: 10px;
+        box-sizing: border-box;
     }
 
     .loc-pill-text {
@@ -407,30 +534,6 @@
 
     .loc-pill-main {
         font-size: 0.82rem;
-    }
-
-    /* Compact User Badge on Mobile Header */
-    .user-profile-badge {
-        padding: 4px 10px 4px 4px;
-    }
-
-    .user-profile-badge span {
-        max-width: 72px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-size: 0.82rem !important;
-    }
-
-    .user-nav-btn {
-        padding: 8px 14px;
-        font-size: 0.82rem;
-    }
-
-    .cart-icon-btn {
-        width: 38px;
-        height: 38px;
-        font-size: 1.05rem;
     }
 
     /* Mobile Menu & Restaurant Filter Controls */
@@ -656,6 +759,78 @@
 
 /* --- 5. Compact Smartphones (max-width: 420px) --- */
 @media (max-width: 420px) {
+    .container {
+        padding: 0 12px;
+    }
+
+    .navbar {
+        column-gap: 6px;
+        row-gap: 6px;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+        gap: 5px;
+    }
+
+    .logo i {
+        font-size: 1.25rem;
+    }
+
+    .nav-actions {
+        gap: 6px;
+    }
+
+    .cart-icon-btn,
+    .hamburger-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .cart-count {
+        width: 17px;
+        height: 17px;
+        font-size: 0.65rem;
+    }
+
+    .user-nav-btn {
+        height: 36px;
+        padding: 0 10px;
+        font-size: 0.8rem;
+        gap: 4px;
+    }
+
+    .user-profile-badge {
+        height: 36px;
+        padding: 0 6px 0 3px;
+        gap: 4px;
+    }
+
+    .user-profile-badge span {
+        display: none;
+    }
+
+    .user-avatar {
+        width: 28px;
+        height: 28px;
+    }
+
+    .hamburger-btn {
+        font-size: 1.25rem;
+    }
+
+    .header-location-pill {
+        padding: 6px 10px;
+    }
+
+    .loc-pill-top {
+        font-size: 0.65rem;
+    }
+
+    .loc-pill-main {
+        font-size: 0.78rem;
+    }
+
     .hero-title {
         font-size: 2rem;
     }
@@ -675,14 +850,6 @@
 
     .categories-grid {
         grid-template-columns: repeat(2, 1fr);
-    }
-
-    .user-profile-badge span {
-        display: none;
-    }
-
-    .user-profile-badge {
-        padding: 3px;
     }
 
     .footer-grid {
