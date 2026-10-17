@@ -393,11 +393,17 @@ app.post('/api/orders', (req, res) => {
         userId: user.uid,
         userEmail: user.email || user.phoneNumber,
         userName: user.name || user.displayName || 'Customer',
+        userPhone: (orderDetails && orderDetails.phone) || '',
         items: cart,
         couponCode: couponCode || null,
         details: orderDetails || {},
+        status: 'Placed',
         createdAt: new Date().toISOString()
     };
+
+    serverOrdersStore.unshift(orderRecord);
+    // Keep max 200 orders in memory
+    if (serverOrdersStore.length > 200) serverOrdersStore.pop();
 
     console.log(`✅ Order placed successfully: ${orderId} by ${user.email || user.phoneNumber} (${user.uid})`);
 
@@ -406,6 +412,18 @@ app.post('/api/orders', (req, res) => {
         orderId,
         message: 'Order verified and placed successfully!',
         order: orderRecord
+    });
+});
+
+const serverOrdersStore = [];
+
+/**
+ * 7. Admin Orders Fetch Endpoint
+ */
+app.get('/api/orders', (req, res) => {
+    res.json({
+        success: true,
+        orders: serverOrdersStore
     });
 });
 

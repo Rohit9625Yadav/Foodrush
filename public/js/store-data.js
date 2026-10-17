@@ -1349,6 +1349,117 @@ async function fetchUsers() {
     });
 }
 
+/**
+ * Save customer order in Cloud Firestore & local cache
+ */
+async function saveOrderToCloud(orderPayload) {
+    if (!orderPayload || !orderPayload.orderId) return;
+
+    // Cache locally for instant access
+    try {
+        const ORDERS_CACHE_KEY = 'foodrush_orders_cache_v2';
+        let localOrders = [];
+        try {
+            localOrders = JSON.parse(localStorage.getItem(ORDERS_CACHE_KEY)) || [];
+        } catch(e) {}
+        const cleanId = String(orderPayload.orderId).trim();
+        const existingIdx = localOrders.findIndex(o => o.orderId === cleanId);
+        if (existingIdx >= 0) {
+            localOrders[existingIdx] = { ...localOrders[existingIdx], ...orderPayload };
+        } else {
+            localOrders.unshift(orderPayload);
+        }
+        localStorage.setItem(ORDERS_CACHE_KEY, JSON.stringify(localOrders.slice(0, 100)));
+    } catch(e) {}
+
+    // Cloud Firestore persistence
+    if (db) {
+        try {
+            const cleanId = String(orderPayload.orderId).replace(/[^a-zA-Z0-9_-]/g, '');
+            const orderDocRef = doc(db, 'orders', cleanId);
+            await setDoc(orderDocRef, orderPayload, { merge: true });
+            console.log('[FoodRush Store] Order synced to Firestore:', cleanId);
+        } catch (err) {
+            console.warn('[FoodRush Store] Firestore save order notice:', err.message);
+        }
+    }
+}
+
+/**
+ * Fetch all customer orders from Firestore & local cache
+ */
+async function fetchOrders() {
+    let cloudOrders = [];
+    if (db) {
+        try {
+            const snap = await getDocs(collection(db, 'orders'));
+            snap.forEach(d => {
+                cloudOrders.push(d.data());
+            });
+        } catch(e) {
+            console.warn('[FoodRush Store] Error fetching orders from Firestore:', e);
+        }
+    }
+
+    // Try fetching from backend API if available
+    try {
+        const apiRes = await fetch('/api/orders');
+        if (apiRes.ok) {
+            const apiData = await apiRes.json();
+            if (apiData.success && Array.isArray(apiData.orders)) {
+                apiData.orders.forEach(o => cloudOrders.push(o));
+            }
+        }
+    } catch(e) {}
+
+    let localOrders = [];
+    try {
+        localOrders = JSON.parse(localStorage.getItem('foodrush_orders_cache_v2')) || [];
+    } catch(e) {}
+
+    const map = new Map();
+    cloudOrders.forEach(o => map.set(o.orderId, o));
+    localOrders.forEach(o => {
+        if (!map.has(o.orderId)) {
+            map.set(o.orderId, o);
+        }
+    });
+
+    return Array.from(map.values()).sort((a, b) => {
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
+}
+
+/**
+ * Update order status (Placed, Preparing, Out for Delivery, Delivered, Cancelled)
+ */
+async function updateOrderStatus(orderId, newStatus) {
+    if (!orderId || !newStatus) return;
+
+    // Update in local cache
+    try {
+        const ORDERS_CACHE_KEY = 'foodrush_orders_cache_v2';
+        let localOrders = JSON.parse(localStorage.getItem(ORDERS_CACHE_KEY)) || [];
+        const target = localOrders.find(o => o.orderId === orderId);
+        if (target) {
+            target.status = newStatus;
+            target.updatedAt = new Date().toISOString();
+            localStorage.setItem(ORDERS_CACHE_KEY, JSON.stringify(localOrders));
+        }
+    } catch(e) {}
+
+    // Update in Firestore
+    if (db) {
+        try {
+            const cleanId = String(orderId).replace(/[^a-zA-Z0-9_-]/g, '');
+            const orderDocRef = doc(db, 'orders', cleanId);
+            await setDoc(orderDocRef, { status: newStatus, updatedAt: new Date().toISOString() }, { merge: true });
+        } catch(e) {
+            console.warn('[FoodRush Store] Update order status notice:', e);
+        }
+    }
+}
+
 // Export unified FoodRushStore object for ES module imports AND attach to window
 export const FoodRushStore = {
     fetchRestaurants,
@@ -1378,7 +1489,11 @@ export const FoodRushStore = {
     uploadImageFile,
     syncUserToCloud,
     fetchUsers,
-    getUsers: fetchUsers
+    getUsers: fetchUsers,
+    saveOrderToCloud,
+    fetchOrders,
+    getOrders: fetchOrders,
+    updateOrderStatus
 };
 
 window.FoodRushStore = FoodRushStore;

@@ -58,6 +58,10 @@
                     <i class="fa-solid fa-map-location-dot"></i>
                     <span>Delivery Zones & PINs</span>
                 </button>
+                <button type="button" class="admin-nav-btn" data-tab="orders">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Customer Orders</span>
+                </button>
                 <button type="button" class="admin-nav-btn" data-tab="customers">
                     <i class="fa-solid fa-users"></i>
                     <span>Customer Logins</span>
@@ -136,6 +140,15 @@
                         <div>
                             <div class="admin-stat-label">Configured PIN Zones</div>
                             <div class="admin-stat-value" id="stat-total-zones">0</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card" style="cursor: pointer;" onclick="switchAdminTab('orders')">
+                        <div class="admin-stat-icon" style="background: #FEE2E2; color: #EF4444;">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                        <div>
+                            <div class="admin-stat-label">Total Customer Orders</div>
+                            <div class="admin-stat-value" id="stat-total-orders">0</div>
                         </div>
                     </div>
                     <div class="admin-stat-card" style="cursor: pointer;" onclick="switchAdminTab('customers')">
@@ -321,6 +334,58 @@
                                     <tr>
                                         <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">
                                             <i class="fa-solid fa-spinner fa-spin"></i> Loading customer data...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 6: CUSTOMER ORDERS & DELIVERIES (STRICTLY OWNER ONLY) -->
+                <section id="admin-tab-orders" class="admin-tab-panel" style="display: none;">
+                    <div class="admin-panel-card">
+                        <div class="admin-panel-header" style="flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin: 0;"><i class="fa-solid fa-receipt" style="color: var(--primary);"></i> Live Customer Orders & Items</h3>
+                                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 4px 0 0;">
+                                    Track real-time orders, what dishes customers are buying, total bill amounts, delivery addresses, and statuses.
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <input type="text" id="admin-order-search" class="form-control" placeholder="Search customer, item, or Order ID..." style="max-width: 260px;">
+                                <select id="admin-order-filter-status" class="form-control" style="max-width: 150px;">
+                                    <option value="ALL">All Statuses</option>
+                                    <option value="Placed">Placed</option>
+                                    <option value="Preparing">Preparing</option>
+                                    <option value="Out for Delivery">Out for Delivery</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                                <button type="button" class="btn btn-outline btn-sm" id="btn-refresh-orders">
+                                    <i class="fa-solid fa-rotate"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="admin-table-responsive" style="margin-top: 15px;">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Food Dishes Ordered</th>
+                                        <th>Bill Total</th>
+                                        <th>Delivery Address</th>
+                                        <th>Payment & Status</th>
+                                        <th>Placed At</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-orders-tbody">
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                                            <i class="fa-solid fa-spinner fa-spin"></i> Loading customer orders...
                                         </td>
                                     </tr>
                                 </tbody>
@@ -565,7 +630,20 @@
         </div>
     </div>
 
-        <!-- Scripts -->
+    <!-- MODAL 4: ORDER DETAILS RECEIPT & STATUS -->
+    <div id="admin-order-modal" class="location-modal-backdrop" style="display: none;">
+        <div class="location-modal-card" style="max-width: 680px;">
+            <div class="location-modal-header">
+                <h3 id="order-modal-title"><i class="fa-solid fa-receipt" style="color: var(--primary);"></i> Order Details</h3>
+                <button type="button" class="location-modal-close" onclick="closeOrderModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="location-modal-body" id="order-modal-body" style="padding: 20px;">
+                <!-- Populated dynamically by admin.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="/js/firebase-config.js?v=2.2"></script>
     <script type="module" src="/js/firebase-auth.js?v=2.2"></script>
     <script type="module" src="/js/store-data.js?v=2.2"></script>

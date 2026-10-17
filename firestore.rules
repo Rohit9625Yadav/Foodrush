@@ -37,7 +37,14 @@ service cloud.firestore {
       allow read, write: if isSignedIn() && request.auth.uid == userId;
     }
 
-    // 4. Orders Collection
+    // 4. Customer Profiles & Logins Collection
+    // Customers can register and update their profile; Admin can read all customer logins
+    match /users/{userId} {
+      allow create, update: if isSignedIn() && request.auth.uid == userId;
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+    }
+
+    // 5. Orders Collection
     // Authenticated users can create orders for themselves and read their own orders; Admin can read/update all
     match /orders/{orderId} {
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;

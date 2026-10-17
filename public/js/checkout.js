@@ -347,6 +347,35 @@ async function handleOrderPlacement() {
         console.warn('Backend order sync notice:', err.message);
     }
 
+    // Persist complete customer order to Cloud Firestore & Admin Store
+    const orderPayload = {
+        orderId: orderId,
+        userId: user ? user.uid : 'guest',
+        userName: customerName,
+        userEmail: user ? (user.email || user.phoneNumber || '') : '',
+        phone: document.getElementById('phone')?.value || '',
+        items: cart,
+        couponCode: totals.couponCode || null,
+        details: {
+            customerName,
+            address: `${address}, ${city}, ${state} - ${pincode}`,
+            pincode,
+            deliveryOption: selectedDeliveryOption,
+            paymentMethod: selectedPaymentMethod,
+            totals: totals
+        },
+        status: 'Placed',
+        createdAt: new Date().toISOString()
+    };
+
+    if (window.FoodRushStore && typeof window.FoodRushStore.saveOrderToCloud === 'function') {
+        try {
+            await window.FoodRushStore.saveOrderToCloud(orderPayload);
+        } catch(e) {
+            console.warn('Order sync to cloud notice:', e);
+        }
+    }
+
     // Record coupon usage & first-order completion so single-use/first-order coupons cannot be abused
     if (totals.hasCoupon && window.FoodRushStore && typeof window.FoodRushStore.recordCouponUsage === 'function') {
         try {

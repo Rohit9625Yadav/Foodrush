@@ -11,6 +11,7 @@ import { FoodRushStore } from "./store-data.js";
 let adminRestaurants = [];
 let adminOffers = [];
 let adminCustomers = [];
+let adminOrders = [];
 let verifiedAdminUser = null;
 let currentMenuBuilderItems = [];
 
@@ -111,19 +112,22 @@ function verifyAdminAccess() {
 
 async function loadAllAdminData() {
     try {
-        const [restaurants, offers, customers] = await Promise.all([
+        const [restaurants, offers, customers, orders] = await Promise.all([
             FoodRushStore.getRestaurants(),
             FoodRushStore.getOffers(),
-            FoodRushStore.getUsers ? FoodRushStore.getUsers() : []
+            FoodRushStore.getUsers ? FoodRushStore.getUsers() : [],
+            FoodRushStore.getOrders ? FoodRushStore.getOrders() : []
         ]);
         adminRestaurants = restaurants || [];
         adminOffers = offers || [];
         adminCustomers = customers || [];
+        adminOrders = orders || [];
         renderAdminStats();
         renderOverviewTab();
         renderRestaurantsTable();
         renderOffersTable();
         renderLocationsTable();
+        renderOrdersTable();
         renderCustomersTable();
         populateRestaurantDropdownForOffers();
     } catch (err) {
@@ -156,6 +160,8 @@ function renderAdminStats() {
     if (offerEl) offerEl.textContent = activeOffers;
     const zoneEl = document.getElementById('stat-total-zones');
     if (zoneEl) zoneEl.textContent = pinSet.size;
+    const orderEl = document.getElementById('stat-total-orders');
+    if (orderEl) orderEl.textContent = adminOrders.length;
     const customerEl = document.getElementById('stat-total-customers');
     if (customerEl) customerEl.textContent = adminCustomers.length;
 }
@@ -178,17 +184,20 @@ window.switchAdminTab = function (tabName) {
         restaurants: 'Restaurant & Store Management',
         offers: 'Offers & Coupons Management',
         locations: 'Delivery Zones & Location Settings',
+        orders: 'Customer Orders & Deliveries',
         customers: 'Registered Customers & Logins'
     };
     const titleEl = document.getElementById('admin-page-title');
     if (titleEl) titleEl.textContent = titles[tabName] || 'Admin Dashboard';
 
-    ['overview', 'restaurants', 'offers', 'locations', 'customers'].forEach(t => {
+    ['overview', 'restaurants', 'offers', 'locations', 'orders', 'customers'].forEach(t => {
         const panel = document.getElementById(`admin-tab-${t}`);
         if (panel) panel.style.display = (t === tabName) ? 'block' : 'none';
     });
 
-    if (tabName === 'customers') {
+    if (tabName === 'orders') {
+        renderOrdersTable();
+    } else if (tabName === 'customers') {
         renderCustomersTable();
     }
 };
@@ -282,6 +291,48 @@ function setupSearchAndFilterListeners() {
             } finally {
                 refreshCustomersBtn.disabled = false;
                 refreshCustomersBtn.innerHTML = `<i class="fa-solid fa-rotate"></i> Refresh`;
+            }
+        });
+    }
+
+    const orderSearch = document.getElementById('admin-order-search');
+    const orderStatusFilter = document.getElementById('admin-order-filter-status');
+    function filterOrders() {
+        const q = (orderSearch?.value || '').toLowerCase().trim();
+        const status = orderStatusFilter?.value || 'ALL';
+        const filtered = adminOrders.filter(o => {
+            const matchesStatus = status === 'ALL' || (o.status || 'Placed').toLowerCase() === status.toLowerCase();
+            if (!matchesStatus) return false;
+            if (!q) return true;
+            const orderId = (o.orderId || '').toLowerCase();
+            const name = (o.userName || (o.details && o.details.customerName) || '').toLowerCase();
+            const email = (o.userEmail || '').toLowerCase();
+            const phone = (o.userPhone || (o.details && o.details.phone) || '').toLowerCase();
+            const items = (o.items || []).map(i => (i.name || '').toLowerCase()).join(' ');
+            return orderId.includes(q) || name.includes(q) || email.includes(q) || phone.includes(q) || items.includes(q);
+        });
+        renderOrdersTable(filtered);
+    }
+    if (orderSearch) orderSearch.addEventListener('input', filterOrders);
+    if (orderStatusFilter) orderStatusFilter.addEventListener('change', filterOrders);
+
+    const refreshOrdersBtn = document.getElementById('btn-refresh-orders');
+    if (refreshOrdersBtn) {
+        refreshOrdersBtn.addEventListener('click', async () => {
+            refreshOrdersBtn.disabled = true;
+            refreshOrdersBtn.innerHTML = `<i class="fa-solid fa-rotate fa-spin"></i> Refreshing...`;
+            try {
+                if (FoodRushStore.getOrders) {
+                    adminOrders = await FoodRushStore.getOrders();
+                    renderOrdersTable();
+                    renderAdminStats();
+                    if (typeof window.showToast === 'function') {
+                        window.showToast(`Updated! ${adminOrders.length} customer orders loaded.`, 'success');
+                    }
+                }
+            } finally {
+                refreshOrdersBtn.disabled = false;
+                refreshOrdersBtn.innerHTML = `<i class="fa-solid fa-rotate"></i> Refresh`;
             }
         });
     }
@@ -906,3 +957,243 @@ function renderCustomersTable(usersToRender = null) {
         `;
     }).join('');
 }
+
+/**
+ * 7. LIVE CUSTOMER ORDERS & DELIVERIES TABLE (STRICTLY OWNER ONLY)
+ */
+function renderOrdersTable(ordersToRender = null) {
+    const tbody = document.getElementById('admin-orders-tbody');
+    if (!tbody) return;
+
+    const list = ordersToRender !== null ? ordersToRender : adminOrders;
+
+    if (!list || list.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                    <i class="fa-solid fa-receipt" style="font-size: 2.2rem; margin-bottom: 12px; display: block; opacity: 0.35;"></i>
+                    <strong style="font-size: 1.05rem; color: var(--text-main);">No Orders Placed Yet</strong>
+                    <p style="font-size: 0.85rem; margin: 6px 0 0;">When customers place orders from restaurants, their ordered items, bill total, address, and live status will appear here automatically.</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = list.map((order) => {
+        const orderId = order.orderId || '#FR---';
+        const customerName = order.userName || order.details?.customerName || 'Customer';
+        const customerEmail = order.userEmail || '—';
+        const customerPhone = order.userPhone || order.details?.phone || '';
+        const items = Array.isArray(order.items) ? order.items : [];
+        const itemsCount = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+        const itemsSummary = items.slice(0, 2).map(it => 
+            `<div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;"><strong>${it.quantity || 1}x</strong> ${it.name || 'Food Item'}</div>`
+        ).join('');
+        const extraItems = items.length > 2 ? `<div style="font-size: 0.74rem; color: #64748B;">+ ${items.length - 2} more item(s)</div>` : '';
+
+        const totals = order.details?.totals || {};
+        const totalAmount = totals.total !== undefined ? totals.total : (order.total || 0);
+
+        const fullAddress = order.details?.address || '—';
+        const pincode = order.details?.pincode || '';
+
+        const status = order.status || 'Placed';
+        let statusBadge = '';
+        if (status === 'Delivered') {
+            statusBadge = `<span style="background: #D1FAE5; color: #065F46; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-circle-check"></i> Delivered</span>`;
+        } else if (status === 'Out for Delivery') {
+            statusBadge = `<span style="background: #EDE9FE; color: #6D28D9; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-motorcycle"></i> Out for Delivery</span>`;
+        } else if (status === 'Preparing') {
+            statusBadge = `<span style="background: #FEF3C7; color: #92400E; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-kitchen-set"></i> Preparing</span>`;
+        } else if (status === 'Cancelled') {
+            statusBadge = `<span style="background: #FEE2E2; color: #991B1B; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-ban"></i> Cancelled</span>`;
+        } else {
+            statusBadge = `<span style="background: #E0F2FE; color: #0369A1; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-clock"></i> Placed</span>`;
+        }
+
+        const dateStr = order.createdAt ? new Date(order.createdAt).toLocaleString('en-IN', {
+            day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) : 'Recent';
+
+        return `
+            <tr>
+                <td>
+                    <span style="font-weight: 800; color: var(--primary); font-family: monospace; font-size: 0.92rem;">${orderId}</span>
+                </td>
+                <td>
+                    <div style="font-weight: 700; color: var(--text-main); font-size: 0.92rem;">${customerName}</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">${customerEmail}</div>
+                    ${customerPhone ? `<div style="font-size: 0.75rem; color: #64748B;"><i class="fa-solid fa-phone" style="font-size: 0.68rem;"></i> ${customerPhone}</div>` : ''}
+                </td>
+                <td>
+                    <div style="font-size: 0.85rem; line-height: 1.4;">
+                        ${itemsSummary}
+                        ${extraItems}
+                    </div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Total ${itemsCount} items</div>
+                </td>
+                <td>
+                    <div style="font-weight: 800; font-size: 1rem; color: #059669;">₹${Number(totalAmount).toFixed(2)}</div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">${order.details?.paymentMethod || 'COD'}</div>
+                </td>
+                <td>
+                    <div style="font-size: 0.82rem; color: var(--text-main); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${fullAddress}">
+                        ${fullAddress}
+                    </div>
+                    ${pincode ? `<div style="font-size: 0.74rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> PIN: ${pincode}</div>` : ''}
+                </td>
+                <td>
+                    ${statusBadge}
+                </td>
+                <td>
+                    <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-main);">${dateStr}</div>
+                </td>
+                <td>
+                    <div style="display: flex; gap: 6px;">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="openOrderModal('${orderId}')" style="padding: 5px 12px; font-size: 0.78rem; white-space: nowrap;">
+                            <i class="fa-solid fa-eye"></i> View Order
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+window.openOrderModal = function(orderId) {
+    const order = adminOrders.find(o => o.orderId === orderId);
+    if (!order) return;
+
+    const modal = document.getElementById('admin-order-modal');
+    const modalBody = document.getElementById('order-modal-body');
+    if (!modal || !modalBody) return;
+
+    const items = Array.isArray(order.items) ? order.items : [];
+    const totals = order.details?.totals || {};
+    const fullAddress = order.details?.address || '—';
+    const customerName = order.userName || order.details?.customerName || 'Customer';
+    const customerEmail = order.userEmail || '—';
+    const customerPhone = order.userPhone || order.details?.phone || '—';
+    const dateStr = order.createdAt ? new Date(order.createdAt).toLocaleString('en-IN') : 'Recent';
+
+    modalBody.innerHTML = `
+        <div style="background: #F8FAFC; border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--border-light);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #E2E8F0;">
+                <div>
+                    <span style="font-size: 0.8rem; color: #64748B; text-transform: uppercase; font-weight: 700;">Order ID</span>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary); font-family: monospace;">${order.orderId}</div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 0.8rem; color: #64748B;">Placed On</span>
+                    <div style="font-size: 0.88rem; font-weight: 600; color: var(--text-main);">${dateStr}</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; font-size: 0.88rem;">
+                <div>
+                    <strong style="color: #64748B; display: block; font-size: 0.78rem; text-transform: uppercase;">Customer</strong>
+                    <div style="font-weight: 700; color: var(--text-main);">${customerName}</div>
+                    <div style="color: var(--text-muted); font-size: 0.82rem;">${customerEmail}</div>
+                    <div style="color: var(--text-muted); font-size: 0.82rem;"><i class="fa-solid fa-phone"></i> ${customerPhone}</div>
+                </div>
+                <div>
+                    <strong style="color: #64748B; display: block; font-size: 0.78rem; text-transform: uppercase;">Delivery Address</strong>
+                    <div style="color: var(--text-main); line-height: 1.4;">${fullAddress}</div>
+                </div>
+                <div>
+                    <strong style="color: #64748B; display: block; font-size: 0.78rem; text-transform: uppercase;">Payment Details</strong>
+                    <div style="font-weight: 600; color: var(--text-main); text-transform: uppercase;">Method: ${order.details?.paymentMethod || 'COD'}</div>
+                    <div style="font-size: 0.82rem; color: var(--text-muted);">Delivery: ${order.details?.deliveryOption || 'Standard'}</div>
+                </div>
+            </div>
+        </div>
+
+        <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 12px;">Dishes Ordered (${items.length} unique items)</h4>
+        <div style="display: flex; flex-direction: column; gap: 10px; max-height: 240px; overflow-y: auto; margin-bottom: 20px; padding-right: 6px;">
+            ${items.map(item => `
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #FFF; border-radius: 8px; border: 1px solid var(--border-light);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover;">` : `<div style="width: 48px; height: 48px; border-radius: 8px; background: #F1F5F9; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-burger" style="color: var(--primary);"></i></div>`}
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.92rem; color: var(--text-main);">${item.name || 'Dish Item'}</div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted);">Price: ₹${item.price || 0}</div>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="background: #F1F5F9; padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 0.82rem; color: var(--text-main);">Qty: ${item.quantity || 1}</span>
+                        <div style="font-weight: 800; font-size: 0.95rem; color: #059669; margin-top: 4px;">₹${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+
+        <!-- Bill Breakdown -->
+        <div style="background: #F8FAFC; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
+                <span style="color: #64748B;">Subtotal:</span>
+                <span style="font-weight: 600;">₹${Number(totals.subtotal || totals.total || 0).toFixed(2)}</span>
+            </div>
+            ${totals.discount ? `
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #16A34A; margin-bottom: 6px;">
+                <span>Discount (${totals.couponCode || 'Promo'}):</span>
+                <span>-₹${Number(totals.discount).toFixed(2)}</span>
+            </div>` : ''}
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
+                <span style="color: #64748B;">Delivery Fee:</span>
+                <span style="font-weight: 600;">₹${Number(totals.deliveryFee || 0).toFixed(2)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;">
+                <span style="color: #64748B;">Taxes:</span>
+                <span style="font-weight: 600;">₹${Number(totals.tax || 0).toFixed(2)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 800; padding-top: 8px; border-top: 1px dashed #CBD5E1; color: var(--text-main);">
+                <span>Final Paid Total:</span>
+                <span style="color: #059669;">₹${Number(totals.total || order.total || 0).toFixed(2)}</span>
+            </div>
+        </div>
+
+        <!-- Status Controller -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-top: 14px; border-top: 1px solid var(--border-light);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label style="font-weight: 700; font-size: 0.88rem; margin: 0;">Update Order Status:</label>
+                <select id="order-status-update-select" class="form-control" style="width: auto; min-width: 170px;">
+                    <option value="Placed" ${order.status === 'Placed' ? 'selected' : ''}>Placed</option>
+                    <option value="Preparing" ${order.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
+                    <option value="Out for Delivery" ${order.status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
+                    <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                    <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                </select>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="saveOrderStatusChange('${order.orderId}')">
+                <i class="fa-solid fa-floppy-disk"></i> Update Status
+            </button>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+};
+
+window.closeOrderModal = function() {
+    const modal = document.getElementById('admin-order-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.saveOrderStatusChange = async function(orderId) {
+    const sel = document.getElementById('order-status-update-select');
+    if (!sel) return;
+    const newStatus = sel.value;
+
+    if (FoodRushStore && FoodRushStore.updateOrderStatus) {
+        await FoodRushStore.updateOrderStatus(orderId, newStatus);
+    }
+    const target = adminOrders.find(o => o.orderId === orderId);
+    if (target) target.status = newStatus;
+
+    renderOrdersTable();
+    closeOrderModal();
+    if (typeof window.showToast === 'function') {
+        window.showToast(`Order ${orderId} status updated to "${newStatus}"!`, 'success');
+    }
+};
