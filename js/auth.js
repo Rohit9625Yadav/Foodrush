@@ -123,6 +123,17 @@ function initLoginForm() {
             const data = await apiRes.json();
             if (data.success) {
                 localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(data.user));
+                try {
+                    fetch('/api/auth/record-login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data.user),
+                        keepalive: true
+                    }).catch(() => {});
+                    if (typeof window.FoodRushStore?.syncUserToCloud === 'function') {
+                        window.FoodRushStore.syncUserToCloud(data.user);
+                    }
+                } catch(e) {}
                 if (typeof showToast === 'function') {
                     showToast(`👋 Welcome back, ${data.user.name}!`, 'primary');
                 }
@@ -169,6 +180,15 @@ function initLoginForm() {
         localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(sessionUser));
 
         // Sync to Cloud Firestore & Admin Panel
+        try {
+            fetch('/api/auth/record-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(sessionUser),
+                keepalive: true
+            }).catch(() => {});
+        } catch(e) {}
+
         if (typeof window.FoodRushStore?.syncUserToCloud === 'function') {
             window.FoodRushStore.syncUserToCloud(sessionUser);
         } else {
@@ -490,6 +510,15 @@ async function submitOtpVerification() {
         localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(newUser));
 
         // Sync to Cloud Firestore & Admin Panel
+        try {
+            fetch('/api/auth/record-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newUser),
+                keepalive: true
+            }).catch(() => {});
+        } catch(e) {}
+
         if (typeof window.FoodRushStore?.syncUserToCloud === 'function') {
             window.FoodRushStore.syncUserToCloud(newUser);
         } else {

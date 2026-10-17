@@ -939,10 +939,14 @@ function renderCustomersTable(usersToRender = null) {
             ? `<img src="${user.photoURL}" alt="${user.name || 'User'}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-light);">`
             : `<div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #FF8A65); color: #FFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem;">${(user.name || 'U').charAt(0).toUpperCase()}</div>`;
 
-        const isGoogle = user.provider === 'google' || (!user.phone && user.email);
-        const providerBadge = isGoogle 
-            ? `<span style="display: inline-flex; align-items: center; gap: 5px; background: #E8F0FE; color: #1967D2; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;"><i class="fa-brands fa-google"></i> Google</span>`
-            : `<span style="display: inline-flex; align-items: center; gap: 5px; background: #ECFDF5; color: #047857; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;"><i class="fa-solid fa-phone"></i> Mobile Phone</span>`;
+        let providerBadge;
+        if (user.provider === 'google') {
+            providerBadge = `<span style="display: inline-flex; align-items: center; gap: 5px; background: #E8F0FE; color: #1967D2; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;"><i class="fa-brands fa-google"></i> Google</span>`;
+        } else if (user.provider === 'email' || user.email) {
+            providerBadge = `<span style="display: inline-flex; align-items: center; gap: 5px; background: #FEF3C7; color: #B45309; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;"><i class="fa-solid fa-envelope"></i> Gmail OTP</span>`;
+        } else {
+            providerBadge = `<span style="display: inline-flex; align-items: center; gap: 5px; background: #ECFDF5; color: #047857; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;"><i class="fa-solid fa-phone"></i> Mobile Phone</span>`;
+        }
 
         const timeStr = user.lastLoginFormatted || (user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString('en-IN') : 'Recent');
         const shortUid = (user.uid || '').slice(0, 14);

@@ -72,8 +72,64 @@ app.use(express.static(path.join(__dirname)));
 // In-Memory Storage for OTPs (with 5-minute expiration)
 const otpStore = new Map();
 
-// Users Database (Dynamic persistent memory storage in server)
-const usersStore = [];
+// Persistent JSON Storage setup (survives restarts and syncs between all logins & orders)
+const DATA_DIR = path.join(__dirname, 'data');
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
+
+try {
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+} catch (e) {}
+
+function loadUsersFromDisk() {
+    try {
+        if (fs.existsSync(USERS_FILE)) {
+            const raw = fs.readFileSync(USERS_FILE, 'utf8');
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) return parsed;
+        }
+    } catch (e) {
+        console.warn('[FoodRush Server] Notice loading users from disk:', e.message);
+    }
+    return [];
+}
+
+function saveUsersToDisk() {
+    try {
+        if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+        fs.writeFileSync(USERS_FILE, JSON.stringify(usersStore, null, 2), 'utf8');
+    } catch (e) {
+        console.warn('[FoodRush Server] Notice saving users to disk:', e.message);
+    }
+}
+
+function loadOrdersFromDisk() {
+    try {
+        if (fs.existsSync(ORDERS_FILE)) {
+            const raw = fs.readFileSync(ORDERS_FILE, 'utf8');
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) return parsed;
+        }
+    } catch (e) {
+        console.warn('[FoodRush Server] Notice loading orders from disk:', e.message);
+    }
+    return [];
+}
+
+function saveOrdersToDisk() {
+    try {
+        if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+        fs.writeFileSync(ORDERS_FILE, JSON.stringify(serverOrdersStore, null, 2), 'utf8');
+    } catch (e) {
+        console.warn('[FoodRush Server] Notice saving orders to disk:', e.message);
+    }
+}
+
+// Users Database (Backed by persistent disk storage)
+const usersStore = loadUsersFromDisk();
+
+// Orders Database (Backed by persistent disk storage)
+const serverOrdersStore = loadOrdersFromDisk();
 
 // Configure Email Transporter using Real Gmail SMTP
 const GMAIL_USER = (process.env.EMAIL_USER || 'rohit09ydv@gmail.com').trim();
@@ -198,29 +254,37 @@ app.post('/api/auth/verify-otp', (req, res) => {
 
     // Check if user already exists
     let user = usersStore.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const generatedUid = 'usr_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6);
     if (!user) {
         user = {
+            uid: generatedUid,
             name: name || storedData.name || 'Foodie',
             email: email.toLowerCase(),
             phone: phone || '',
             password: password || 'defaultPass',
             isVerified: true,
-            provider: 'email'
+            provider: 'email',
+            lastLoginAt: new Date().toISOString()
         };
-        usersStore.push(user);
+        usersStore.unshift(user);
     } else {
         user.isVerified = true;
+        user.lastLoginAt = new Date().toISOString();
+        if (!user.uid) user.uid = generatedUid;
     }
+    saveUsersToDisk();
 
     res.json({
         success: true,
         message: 'Email verified successfully!',
         user: {
+            uid: user.uid,
             name: user.name,
             email: user.email,
             phone: user.phone,
             provider: user.provider,
-            isVerified: true
+            isVerified: true,
+            lastLoginAt: user.lastLoginAt
         }
     });
 });
@@ -246,17 +310,56 @@ app.post('/api/auth/login', (req, res) => {
         });
     }
 
+    user.lastLoginAt = new Date().toISOString();
+    saveUsersToDisk();
+
     res.json({
         success: true,
         message: 'Login successful',
         user: {
+            uid: user.uid || ('usr_' + Buffer.from(user.email).toString('hex').slice(0, 10)),
             name: user.name,
             email: user.email,
             phone: user.phone,
             provider: user.provider,
+            lastLoginAt: user.lastLoginAt,
             isLoggedIn: true
         }
     });
+});
+
+/**
+ * 3a. Record Customer Login / Session (from Google OAuth, Mobile OTP, or Checkout)
+ */
+app.post('/api/auth/record-login', (req, res) => {
+    const { uid, name, email, phone, provider, photoURL, lastLoginAt } = req.body;
+    if (!email && !phone && !uid) {
+        return res.status(400).json({ success: false, message: 'Invalid customer payload' });
+    }
+
+    const cleanEmail = (email || '').toLowerCase().trim();
+    const cleanUid = uid || (cleanEmail ? 'usr_' + Buffer.from(cleanEmail).toString('hex').slice(0, 12) : 'usr_' + Date.now());
+    const existingIdx = usersStore.findIndex(u => (cleanEmail && u.email.toLowerCase() === cleanEmail) || (cleanUid && u.uid === cleanUid));
+
+    const userObj = {
+        uid: cleanUid,
+        name: name || (cleanEmail ? cleanEmail.split('@')[0] : 'FoodRush Customer'),
+        email: cleanEmail,
+        phone: phone || '',
+        photoURL: photoURL || '',
+        provider: provider || (photoURL || cleanEmail.includes('google') ? 'google' : 'email'),
+        lastLoginAt: lastLoginAt || new Date().toISOString()
+    };
+
+    if (existingIdx >= 0) {
+        usersStore[existingIdx] = { ...usersStore[existingIdx], ...userObj };
+    } else {
+        usersStore.unshift(userObj);
+    }
+    saveUsersToDisk();
+
+    console.log(`[FoodRush Server] Recorded customer login: ${userObj.email || userObj.phone} (${userObj.provider}) | Total customers: ${usersStore.length}`);
+    res.json({ success: true, user: userObj, count: usersStore.length });
 });
 
 /**
@@ -271,7 +374,7 @@ app.get('/api/auth/users', (req, res) => {
             phone: u.phone || '',
             provider: u.provider || 'email',
             lastLoginAt: u.lastLoginAt || new Date().toISOString(),
-            uid: u.uid || ('usr_' + Buffer.from(u.email).toString('hex').slice(0, 10))
+            uid: u.uid || ('usr_' + Buffer.from(u.email || 'guest').toString('hex').slice(0, 10))
         }))
     });
 });
@@ -421,6 +524,28 @@ app.post('/api/orders', (req, res) => {
     serverOrdersStore.unshift(orderRecord);
     // Keep max 200 orders in memory
     if (serverOrdersStore.length > 200) serverOrdersStore.pop();
+    saveOrdersToDisk();
+
+    // Auto-record ordering customer to users database
+    try {
+        const orderEmail = (user.email || '').toLowerCase().trim();
+        const existingIdx = usersStore.findIndex(u => (orderEmail && u.email.toLowerCase() === orderEmail) || (user.uid && u.uid === user.uid));
+        const customerObj = {
+            uid: user.uid,
+            name: user.name || user.displayName || (orderEmail ? orderEmail.split('@')[0] : 'FoodRush Customer'),
+            email: orderEmail,
+            phone: (orderDetails && orderDetails.phone) || user.phoneNumber || user.phone || '',
+            photoURL: user.photoURL || '',
+            provider: user.provider || (user.photoURL || orderEmail.includes('google') ? 'google' : 'email'),
+            lastLoginAt: new Date().toISOString()
+        };
+        if (existingIdx >= 0) {
+            usersStore[existingIdx] = { ...usersStore[existingIdx], ...customerObj };
+        } else {
+            usersStore.unshift(customerObj);
+        }
+        saveUsersToDisk();
+    } catch(e) {}
 
     console.log(`✅ Order placed successfully: ${orderId} by ${user.email || user.phoneNumber} (${user.uid})`);
 
@@ -431,8 +556,6 @@ app.post('/api/orders', (req, res) => {
         order: orderRecord
     });
 });
-
-const serverOrdersStore = [];
 
 /**
  * 7. Admin Orders Fetch Endpoint

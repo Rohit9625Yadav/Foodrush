@@ -967,6 +967,167 @@
     .menu-builder-row {
         grid-template-columns: 1fr;
     }
+
+    /* Admin Dashboard Mobile Optimization */
+    .admin-layout {
+        flex-direction: column !important;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    .admin-sidebar {
+        width: 100% !important;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+
+    .admin-sidebar-header {
+        padding: 10px 14px;
+    }
+
+    .admin-sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 8px 12px;
+        gap: 8px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .admin-sidebar-nav::-webkit-scrollbar {
+        height: 3px;
+    }
+    .admin-sidebar-nav::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.25);
+        border-radius: 4px;
+    }
+
+    .admin-nav-btn {
+        padding: 8px 13px;
+        font-size: 0.82rem;
+        flex-shrink: 0;
+        border-radius: 20px;
+        white-space: nowrap;
+        background: rgba(255,255,255,0.08);
+        color: #CBD5E1;
+    }
+
+    .admin-nav-btn.active {
+        background: var(--primary) !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 2px 8px rgba(255, 87, 34, 0.4);
+    }
+
+    .admin-sidebar-footer {
+        display: none !important;
+    }
+
+    .admin-topbar {
+        padding: 12px 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .admin-topbar > div:first-child {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .admin-topbar > div:last-child {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .admin-topbar > div:last-child .btn {
+        flex: 1 1 auto;
+        font-size: 0.82rem;
+        padding: 8px 10px;
+        white-space: nowrap;
+        justify-content: center;
+    }
+
+    .admin-content-body {
+        padding: 14px 10px;
+    }
+
+    .admin-stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .admin-stat-card {
+        padding: 12px 10px;
+        gap: 10px;
+        border-radius: 12px;
+    }
+
+    .admin-stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.15rem;
+        border-radius: 10px;
+    }
+
+    .admin-stat-label {
+        font-size: 0.72rem;
+    }
+
+    .admin-stat-value {
+        font-size: 1.3rem;
+    }
+
+    .admin-panel-card {
+        padding: 14px 12px;
+        border-radius: 12px;
+    }
+
+    .admin-panel-header {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+    }
+
+    .admin-panel-header > div {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .admin-panel-header input.form-control,
+    .admin-panel-header select.form-control {
+        max-width: 100% !important;
+        width: 100% !important;
+        flex: 1 1 100%;
+    }
+
+    .admin-table-responsive {
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        background: #fff;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 10px;
+    }
+
+    .admin-table {
+        min-width: 600px;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+    }
 }
 
 /* --- 5. Compact Smartphones (max-width: 420px) --- */
@@ -1070,7 +1231,21 @@
     }
 
     .admin-stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+    }
+
+    .admin-topbar h1#admin-page-title {
+        font-size: 1.12rem !important;
+    }
+
+    .admin-stat-card {
+        padding: 10px 12px;
+    }
+
+    .admin-nav-btn {
+        padding: 7px 11px;
+        font-size: 0.78rem;
     }
 
     .toast {

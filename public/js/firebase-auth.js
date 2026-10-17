@@ -140,6 +140,16 @@ function recordUserSession(sessionUser) {
             }).catch(() => {});
         }
     } catch(e) {}
+
+    // Directly notify server backend to persist login to disk & in-memory store
+    try {
+        fetch('/api/auth/record-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sessionUser),
+            keepalive: true
+        }).catch(() => {});
+    } catch(e) {}
 }
 
 /**

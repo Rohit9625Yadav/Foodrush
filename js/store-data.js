@@ -1262,10 +1262,14 @@ export async function uploadImageFile(file, folder = 'restaurants') {
 }
 
 /**
- * Synchronize authenticated customer to Cloud Firestore & local cache
+ * Synchronize authenticated customer to Cloud Firestore, Server API, & local cache
  */
 async function syncUserToCloud(userData) {
-    if (!userData || !userData.uid) return;
+    if (!userData) return;
+
+    const cleanEmail = (userData.email || '').toLowerCase().trim();
+    const cleanPhone = (userData.phone || userData.phoneNumber || '').trim();
+    const uid = userData.uid || ('usr_' + (cleanEmail ? btoa(encodeURIComponent(cleanEmail)).replace(/=/g, '') : (cleanPhone ? 'ph_' + cleanPhone : Date.now())));
 
     const formattedTime = new Date().toLocaleString('en-IN', { 
         day: '2-digit', 
@@ -1276,49 +1280,65 @@ async function syncUserToCloud(userData) {
         hour12: true 
     });
 
+    const isGoogle = userData.provider === 'google' || Boolean(userData.photoURL) || cleanEmail.includes('google');
+    const isPhone = userData.provider === 'phone' || (!cleanEmail && cleanPhone);
+
     const userPayload = {
-        uid: userData.uid,
-        name: userData.name || userData.displayName || 'FoodRush Customer',
-        email: userData.email || '',
-        phone: userData.phone || userData.phoneNumber || '',
+        uid: uid,
+        name: userData.name || userData.displayName || (cleanEmail ? cleanEmail.split('@')[0] : (cleanPhone ? 'Mobile User ' + cleanPhone.slice(-4) : 'FoodRush Customer')),
+        email: cleanEmail,
+        phone: cleanPhone,
         photoURL: userData.photoURL || '',
-        provider: userData.provider || (userData.email ? 'google' : 'phone'),
+        provider: isGoogle ? 'google' : (isPhone ? 'phone' : 'email'),
         lastLoginAt: new Date().toISOString(),
         lastLoginFormatted: formattedTime
     };
 
-    // Cache locally for instant access
+    // 1. Cache locally for instant access
     try {
         const USERS_CACHE_KEY = 'foodrush_users_cache_v2';
         let localUsers = [];
         try {
             localUsers = JSON.parse(localStorage.getItem(USERS_CACHE_KEY)) || [];
         } catch(e) {}
-        const idx = localUsers.findIndex(u => u.uid === userData.uid || (u.email && u.email === userData.email));
+        const idx = localUsers.findIndex(u => (u.uid && u.uid === uid) || (cleanEmail && u.email && u.email.toLowerCase() === cleanEmail));
         if (idx >= 0) {
             localUsers[idx] = { ...localUsers[idx], ...userPayload };
         } else {
             localUsers.unshift(userPayload);
         }
-        localStorage.setItem(USERS_CACHE_KEY, JSON.stringify(localUsers));
+        localStorage.setItem(USERS_CACHE_KEY, JSON.stringify(localUsers.slice(0, 100)));
     } catch(e) {}
 
-    // Cloud Firestore persistence
+    // 2. Cloud Firestore persistence
     if (db) {
         try {
-            const userDocRef = doc(db, 'users', userData.uid);
+            const userDocRef = doc(db, 'users', uid);
             await setDoc(userDocRef, userPayload, { merge: true });
+            console.log('[FoodRush Store] User recorded in Firestore:', userPayload.email || userPayload.phone);
         } catch(err) {
             console.warn('[FoodRush Store] Firestore sync user notice:', err.message);
         }
     }
+
+    // 3. Central Server API persistence (keeps cross-device server record)
+    try {
+        fetch('/api/auth/record-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userPayload),
+            keepalive: true
+        }).catch(() => {});
+    } catch(e) {}
 }
 
 /**
- * Fetch all registered customers from Firestore & local cache
+ * Fetch all registered customers from Firestore, Backend Server API, Placed Orders, & local cache
  */
 async function fetchUsers() {
     let cloudUsers = [];
+
+    // 1. Fetch from Firestore
     if (db) {
         try {
             const snap = await getDocs(collection(db, 'users'));
@@ -1330,13 +1350,38 @@ async function fetchUsers() {
         }
     }
 
-    // Try fetching from backend API if available
+    // 2. Fetch from backend API
     try {
         const apiRes = await fetch('/api/auth/users');
         if (apiRes.ok) {
             const apiData = await apiRes.json();
             if (apiData.success && Array.isArray(apiData.users)) {
                 apiData.users.forEach(u => cloudUsers.push(u));
+            }
+        }
+    } catch(e) {}
+
+    // 3. Also extract customer information from placed orders (real verified buyers)
+    try {
+        const ordersRes = await fetch('/api/orders');
+        if (ordersRes.ok) {
+            const ordersData = await ordersRes.json();
+            if (ordersData.success && Array.isArray(ordersData.orders)) {
+                ordersData.orders.forEach(o => {
+                    const custEmail = (o.userEmail || (o.customer && o.customer.email) || '').toLowerCase().trim();
+                    const custPhone = o.userPhone || (o.customer && o.customer.phone) || '';
+                    const custName = o.userName || (o.customer && o.customer.name) || '';
+                    if (custEmail || custPhone) {
+                        cloudUsers.push({
+                            uid: o.userId || ('usr_' + (custEmail ? btoa(encodeURIComponent(custEmail)).replace(/=/g, '') : Date.now())),
+                            name: custName || (custEmail ? custEmail.split('@')[0] : 'FoodRush Buyer'),
+                            email: custEmail,
+                            phone: custPhone,
+                            provider: custEmail ? (custEmail.includes('google') ? 'google' : 'email') : 'phone',
+                            lastLoginAt: o.createdAt || new Date().toISOString()
+                        });
+                    }
+                });
             }
         }
     } catch(e) {}
@@ -1357,16 +1402,19 @@ async function fetchUsers() {
     } catch(e) {}
 
     const map = new Map();
+
     cloudUsers.forEach(u => {
-        const key = (u.email || u.uid || '').toLowerCase();
+        const key = (u.email || u.phone || u.uid || '').toLowerCase();
         if (key) map.set(key, u);
     });
+
     localUsers.forEach(u => {
-        const key = (u.email || u.uid || '').toLowerCase();
+        const key = (u.email || u.phone || u.uid || '').toLowerCase();
         if (key && !map.has(key)) map.set(key, u);
     });
+
     authDbUsers.forEach(u => {
-        const key = (u.email || u.uid || '').toLowerCase();
+        const key = (u.email || u.phone || u.uid || '').toLowerCase();
         if (key && !map.has(key)) {
             map.set(key, {
                 uid: u.uid || ('user-' + Math.random().toString(36).substr(2, 6)),
@@ -1378,15 +1426,16 @@ async function fetchUsers() {
             });
         }
     });
-    if (activeUser && activeUser.email) {
-        const key = activeUser.email.toLowerCase();
+
+    if (activeUser && (activeUser.email || activeUser.phoneNumber)) {
+        const key = (activeUser.email || activeUser.phoneNumber || activeUser.uid).toLowerCase();
         if (!map.has(key)) {
             map.set(key, {
-                uid: activeUser.uid || 'admin-uid',
-                name: activeUser.name || 'Admin Customer',
-                email: activeUser.email,
-                phone: activeUser.phone || '',
-                provider: activeUser.provider || 'google',
+                uid: activeUser.uid || 'current-user',
+                name: activeUser.name || activeUser.displayName || 'Current Customer',
+                email: activeUser.email || '',
+                phone: activeUser.phone || activeUser.phoneNumber || '',
+                provider: activeUser.provider || (activeUser.photoURL ? 'google' : 'email'),
                 lastLoginAt: new Date().toISOString()
             });
         }
