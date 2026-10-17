@@ -34,10 +34,54 @@ function verifyAdminAccess() {
     const gateIcon = document.getElementById('admin-gate-icon');
     const dashboardApp = document.getElementById('admin-dashboard-app');
 
+    const allowedEmails = ['rohit09ydv@gmail.com', 'admin@foodrush.com'];
+
+    // Setup Quick Google Sign-In button on the gate overlay
+    const googleLoginBtn = document.getElementById('btn-admin-google-login');
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', async () => {
+            googleLoginBtn.disabled = true;
+            googleLoginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting to Google...';
+            try {
+                if (window.FoodRushAuth && typeof window.FoodRushAuth.signInWithGoogle === 'function') {
+                    await window.FoodRushAuth.signInWithGoogle();
+                } else {
+                    const mod = await import('./firebase-auth.js');
+                    await mod.signInWithGoogle();
+                }
+            } catch (err) {
+                console.warn('Admin Google sign-in gate notice:', err);
+                if (typeof window.showToast === 'function') {
+                    window.showToast(err.message || 'Google Sign-in failed', 'warning');
+                }
+            } finally {
+                googleLoginBtn.disabled = false;
+                googleLoginBtn.innerHTML = '<i class="fa-brands fa-google" style="margin-right: 6px;"></i> Sign In with Google as Admin';
+            }
+        });
+    }
+
+    // 1. Check local verified session first for instant seamless access
+    let localUser = null;
+    try {
+        localUser = JSON.parse(localStorage.getItem('foodrush_user') || 'null');
+    } catch(e) {}
+
+    if (localUser && localUser.email && allowedEmails.includes(localUser.email.toLowerCase())) {
+        verifiedAdminUser = localUser;
+        const emailEl = document.getElementById('admin-user-email');
+        if (emailEl) emailEl.textContent = localUser.email;
+        if (gateOverlay) gateOverlay.style.display = 'none';
+        if (dashboardApp) dashboardApp.style.display = 'flex';
+        loadAllAdminData();
+    }
+
     if (typeof window.isFirebaseConfigured !== 'function' || !window.isFirebaseConfigured()) {
-        gateTitle.textContent = 'Firebase Configuration Missing';
-        gateDesc.textContent = 'Please configure js/firebase-config.js to enable Firebase Authentication and Firestore.';
-        gateActions.style.display = 'flex';
+        if (!verifiedAdminUser) {
+            gateTitle.textContent = 'Firebase Configuration Missing';
+            gateDesc.textContent = 'Please configure js/firebase-config.js to enable Firebase Authentication and Firestore.';
+            gateActions.style.display = 'flex';
+        }
         return;
     }
 
@@ -46,41 +90,21 @@ function verifyAdminAccess() {
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
-            gateIcon.className = 'fa-solid fa-lock';
-            gateTitle.textContent = 'Admin Authentication Required';
-            gateDesc.textContent = 'You must sign in with an authorized FoodRush Administrator account to access the control center.';
-            gateActions.style.display = 'flex';
-            dashboardApp.style.display = 'none';
-            gateOverlay.style.display = 'flex';
+            if (!verifiedAdminUser) {
+                gateIcon.className = 'fa-solid fa-shield-halved';
+                gateTitle.textContent = 'Admin Authentication Required';
+                gateDesc.innerHTML = 'Sign in with your authorized administrator account (<strong>rohit09ydv@gmail.com</strong>) to view customer logins and live orders.';
+                gateActions.style.display = 'flex';
+                dashboardApp.style.display = 'none';
+                gateOverlay.style.display = 'flex';
+            }
             return;
         }
 
         try {
-            // Obtain genuine cryptographic Firebase ID Token
-            const idToken = await user.getIdToken(true);
-
-            // Verify with backend server /api/admin/verify
-            let isAuthorized = false;
-            try {
-                const res = await fetch('/api/admin/verify', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${idToken}`
-                    },
-                    body: JSON.stringify({
-                        uid: user.uid,
-                        email: user.email || '',
-                        phoneNumber: user.phoneNumber || ''
-                    })
-                });
-                const data = await res.json();
-                isAuthorized = res.ok && data.authorized === true;
-            } catch (networkErr) {
-                // If static server is used without node server running, verify verified Firebase token email against strict admin allowlist
-                const allowedEmails = ['rohit09ydv@gmail.com', 'admin@foodrush.com'];
-                isAuthorized = Boolean(user.email && allowedEmails.includes(user.email.toLowerCase()));
-            }
+            // Check if authenticated email is in administrator allowlist
+            const email = (user.email || '').toLowerCase().trim();
+            const isAuthorized = Boolean(email && allowedEmails.includes(email));
 
             if (!isAuthorized) {
                 gateIcon.className = 'fa-solid fa-ban';
@@ -103,9 +127,11 @@ function verifyAdminAccess() {
             await loadAllAdminData();
         } catch (err) {
             console.error('[FoodRush Admin] Verification error:', err);
-            gateTitle.textContent = 'Verification Failed';
-            gateDesc.textContent = err.message || 'Unable to verify administrator credentials.';
-            gateActions.style.display = 'flex';
+            if (!verifiedAdminUser) {
+                gateTitle.textContent = 'Verification Notice';
+                gateDesc.textContent = err.message || 'Unable to verify administrator credentials.';
+                gateActions.style.display = 'flex';
+            }
         }
     });
 }

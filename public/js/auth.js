@@ -162,10 +162,22 @@ function initLoginForm() {
             name: existingUser.name,
             email: existingUser.email,
             phone: existingUser.phone || '',
+            uid: existingUser.uid || ('user-' + Math.random().toString(36).substr(2, 6)),
             provider: existingUser.provider || 'email',
             isLoggedIn: true
         };
         localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(sessionUser));
+
+        // Sync to Cloud Firestore & Admin Panel
+        if (typeof window.FoodRushStore?.syncUserToCloud === 'function') {
+            window.FoodRushStore.syncUserToCloud(sessionUser);
+        } else {
+            import('./store-data.js').then(mod => {
+                if (mod?.FoodRushStore?.syncUserToCloud) {
+                    mod.FoodRushStore.syncUserToCloud(sessionUser);
+                }
+            }).catch(() => {});
+        }
 
         if (typeof showToast === 'function') {
             showToast(`👋 Welcome back, ${existingUser.name}!`, 'primary');

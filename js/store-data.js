@@ -1330,19 +1330,67 @@ async function fetchUsers() {
         }
     }
 
+    // Try fetching from backend API if available
+    try {
+        const apiRes = await fetch('/api/auth/users');
+        if (apiRes.ok) {
+            const apiData = await apiRes.json();
+            if (apiData.success && Array.isArray(apiData.users)) {
+                apiData.users.forEach(u => cloudUsers.push(u));
+            }
+        }
+    } catch(e) {}
+
     let localUsers = [];
     try {
         localUsers = JSON.parse(localStorage.getItem('foodrush_users_cache_v2')) || [];
     } catch(e) {}
 
+    let authDbUsers = [];
+    try {
+        authDbUsers = JSON.parse(localStorage.getItem('foodrush_users_db')) || [];
+    } catch(e) {}
+
+    let activeUser = null;
+    try {
+        activeUser = JSON.parse(localStorage.getItem('foodrush_user')) || null;
+    } catch(e) {}
+
     const map = new Map();
-    cloudUsers.forEach(u => map.set(u.uid || u.email, u));
+    cloudUsers.forEach(u => {
+        const key = (u.email || u.uid || '').toLowerCase();
+        if (key) map.set(key, u);
+    });
     localUsers.forEach(u => {
-        const key = u.uid || u.email;
-        if (!map.has(key)) {
-            map.set(key, u);
+        const key = (u.email || u.uid || '').toLowerCase();
+        if (key && !map.has(key)) map.set(key, u);
+    });
+    authDbUsers.forEach(u => {
+        const key = (u.email || u.uid || '').toLowerCase();
+        if (key && !map.has(key)) {
+            map.set(key, {
+                uid: u.uid || ('user-' + Math.random().toString(36).substr(2, 6)),
+                name: u.name || 'FoodRush Customer',
+                email: u.email || '',
+                phone: u.phone || '',
+                provider: u.provider || 'email',
+                lastLoginAt: u.lastLoginAt || new Date().toISOString()
+            });
         }
     });
+    if (activeUser && activeUser.email) {
+        const key = activeUser.email.toLowerCase();
+        if (!map.has(key)) {
+            map.set(key, {
+                uid: activeUser.uid || 'admin-uid',
+                name: activeUser.name || 'Admin Customer',
+                email: activeUser.email,
+                phone: activeUser.phone || '',
+                provider: activeUser.provider || 'google',
+                lastLoginAt: new Date().toISOString()
+            });
+        }
+    }
 
     return Array.from(map.values()).sort((a, b) => {
         return new Date(b.lastLoginAt || 0) - new Date(a.lastLoginAt || 0);

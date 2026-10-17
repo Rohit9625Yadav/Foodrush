@@ -463,13 +463,22 @@ function resumePendingActionAfterLogin() {
  * Updates UI header badges, account buttons, and profile info
  */
 export function updateUIForAuthState(user) {
+    const isAdmin = Boolean(user && user.isLoggedIn && user.email && ['rohit09ydv@gmail.com', 'admin@foodrush.com'].includes(user.email.toLowerCase()));
+
     // 1. Update navigation badges
     const authContainers = document.querySelectorAll('.auth-nav-container');
     authContainers.forEach(container => {
         if (user && user.isLoggedIn) {
             const initial = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+            const adminNavBtn = isAdmin ? `
+                <a href="/admin/" class="btn btn-sm" style="background: linear-gradient(135deg, #FF5722, #E64A19); color: #fff; font-weight: 700; border-radius: 20px; padding: 5px 12px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(255,87,34,0.3); font-size: 0.8rem;" title="Open Admin Control Center">
+                    <i class="fa-solid fa-shield-halved"></i> Admin Panel
+                </a>
+            ` : '';
+
             container.innerHTML = `
-                <div class="user-logged-in-wrap" style="display: flex; align-items: center; gap: 10px;">
+                <div class="user-logged-in-wrap" style="display: flex; align-items: center; gap: 8px;">
+                    ${adminNavBtn}
                     <a href="/auth/" class="user-profile-badge" title="My Account (${user.email})">
                         <div class="user-avatar" style="background: #4285F4; width: 34px; height: 34px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700;">
                             ${initial}
@@ -510,8 +519,26 @@ export function updateUIForAuthState(user) {
             const emailEl = document.getElementById('session-user-email');
             const uidEl = document.getElementById('session-user-uid');
             if (nameEl) nameEl.textContent = user.name;
-            if (emailEl) emailEl.innerHTML = `${user.email} <span class="badge badge-primary" style="font-size:0.75rem; margin-left: 6px;">Verified Google Account</span>`;
-            if (uidEl) uidEl.textContent = user.uid ? `Firebase UID: ${user.uid}` : '';
+            if (emailEl) emailEl.innerHTML = `${user.email} <span class="badge badge-primary" style="font-size:0.75rem; margin-left: 6px;">${user.provider === 'google' ? 'Google Account' : 'Verified User'}</span>`;
+            if (uidEl) uidEl.textContent = user.uid ? `User UID: ${user.uid}` : '';
+
+            // If Admin, show big Admin Dashboard button
+            let adminCardBtn = document.getElementById('session-admin-dashboard-btn');
+            if (isAdmin) {
+                if (!adminCardBtn) {
+                    adminCardBtn = document.createElement('a');
+                    adminCardBtn.id = 'session-admin-dashboard-btn';
+                    adminCardBtn.href = '/admin/';
+                    adminCardBtn.className = 'btn btn-primary btn-block btn-lg';
+                    adminCardBtn.style.background = 'linear-gradient(135deg, #FF5722, #D84315)';
+                    adminCardBtn.style.marginBottom = '12px';
+                    adminCardBtn.innerHTML = '<i class="fa-solid fa-shield-halved" style="margin-right: 8px;"></i> Open Admin Dashboard (Logins & Orders)';
+                    const actionsBox = sessionCard.querySelector('div[style*="flex-direction: column"]');
+                    if (actionsBox) actionsBox.prepend(adminCardBtn);
+                }
+            } else if (adminCardBtn) {
+                adminCardBtn.remove();
+            }
         } else {
             authWrapper.style.display = 'block';
             sessionCard.style.display = 'none';

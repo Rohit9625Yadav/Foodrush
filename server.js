@@ -259,6 +259,23 @@ app.post('/api/auth/login', (req, res) => {
     });
 });
 
+/**
+ * 3b. Fetch Registered Users (for Admin Customer Logins)
+ */
+app.get('/api/auth/users', (req, res) => {
+    res.json({
+        success: true,
+        users: usersStore.map(u => ({
+            name: u.name,
+            email: u.email,
+            phone: u.phone || '',
+            provider: u.provider || 'email',
+            lastLoginAt: u.lastLoginAt || new Date().toISOString(),
+            uid: u.uid || ('usr_' + Buffer.from(u.email).toString('hex').slice(0, 10))
+        }))
+    });
+});
+
 // Server-side Admin Allowlist & Coupon Usage Ledger
 const AUTHORIZED_ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'rohit09ydv@gmail.com,admin@foodrush.com')
     .split(',')
