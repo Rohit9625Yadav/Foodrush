@@ -50,6 +50,9 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 body {
@@ -57,6 +60,8 @@ body {
     background-color: var(--bg-color);
     color: var(--text-main);
     line-height: 1.6;
+    width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
     min-height: 100vh;
     display: flex;
@@ -1684,6 +1689,9 @@ button {
     grid-template-columns: 1.2fr 0.8fr;
     gap: 30px;
     align-items: start;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .checkout-box {
@@ -1693,6 +1701,10 @@ button {
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border-light);
     margin-bottom: 24px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .box-title {
@@ -1713,12 +1725,15 @@ button {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
+    width: 100%;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    width: 100%;
+    min-width: 0;
 }
 
 .form-group.col-span-2 {
@@ -1732,12 +1747,32 @@ button {
 }
 
 .form-control {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     padding: 12px 16px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     font-size: 0.92rem;
     background-color: var(--bg-color);
     transition: var(--transition-fast);
+}
+
+#place-order-btn {
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px 22px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border-radius: var(--radius-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 15px rgba(255, 87, 34, 0.35);
+    cursor: pointer;
+    transition: var(--transition);
 }
 
 .form-control:focus {

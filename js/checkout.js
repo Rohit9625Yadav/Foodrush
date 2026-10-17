@@ -90,39 +90,39 @@ window.renderCheckoutSummary = function () {
     const finalGrandTotal = Number(Math.max(0, totals.subtotal + deliveryCost + totals.taxes - (totals.freeDeliveryApplied ? 0 : totals.discount)).toFixed(2));
 
     summaryContainer.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-            <h3 class="box-title" style="margin: 0;"><i class="fa-solid fa-basket-shopping"></i> Order Summary (${totals.itemCount})</h3>
-            <button type="button" class="btn btn-outline btn-sm" onclick="openLocationModal()" style="font-size: 0.76rem; padding: 4px 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; width: 100%;">
+            <h3 class="box-title" style="margin: 0; font-size: 1.1rem;"><i class="fa-solid fa-basket-shopping"></i> Order Summary (${totals.itemCount})</h3>
+            <button type="button" class="btn btn-outline btn-sm" onclick="openLocationModal()" style="font-size: 0.76rem; padding: 4px 10px; border-radius: var(--radius-full); white-space: nowrap;">
                 <i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Saved Addresses
             </button>
         </div>
 
-        <div style="max-height: 200px; overflow-y: auto; margin-bottom: 18px; padding-right: 5px;">
+        <div style="max-height: 200px; overflow-y: auto; margin-bottom: 18px; padding-right: 5px; width: 100%; box-sizing: border-box;">
             ${cart.map(item => `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.9rem;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <img src="${item.image}" alt="${item.name}" style="width: 42px; height: 42px; border-radius: 6px; object-fit: cover;">
-                        <div>
-                            <strong>${item.name}</strong>
-                            <div style="color: var(--text-muted); font-size: 0.8rem;">Qty: ${item.quantity} × ₹${item.price}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.88rem; gap: 10px; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
+                        <img src="${item.image}" alt="${item.name}" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover; flex-shrink: 0;">
+                        <div style="min-width: 0; flex: 1; overflow: hidden;">
+                            <strong style="display: block; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.name}</strong>
+                            <div style="color: var(--text-muted); font-size: 0.78rem;">Qty: ${item.quantity} × ₹${item.price}</div>
                         </div>
                     </div>
-                    <span style="font-weight: 700;">₹${Number(item.price * item.quantity).toFixed(2)}</span>
+                    <span style="font-weight: 700; white-space: nowrap; flex-shrink: 0; color: var(--secondary);">₹${Number(item.price * item.quantity).toFixed(2)}</span>
                 </div>
             `).join('')}
         </div>
 
         <!-- Coupon Input & Remove in Checkout -->
-        <div style="margin-bottom: 16px; padding: 12px; background: #F8FAFC; border-radius: 10px; border: 1px dashed var(--border-color);">
+        <div style="margin-bottom: 16px; padding: 12px; background: #F8FAFC; border-radius: 10px; border: 1px dashed var(--border-color); width: 100%; box-sizing: border-box;">
             <label style="font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 6px;">
                 <i class="fa-solid fa-ticket" style="color: var(--primary);"></i> Have a Promo / Coupon Code?
             </label>
-            <div style="display: flex; gap: 8px;">
-                <input type="text" id="coupon-input-field" class="form-control" placeholder="FOODRUSH20 / FIRST50 / FREEDEL" value="${totals.couponCode}" style="text-transform: uppercase; font-size: 0.85rem;">
+            <div style="display: flex; gap: 8px; width: 100%; box-sizing: border-box;">
+                <input type="text" id="coupon-input-field" class="form-control" placeholder="Enter coupon code" value="${totals.couponCode}" style="flex: 1; min-width: 0; width: 100%; padding: 8px 12px; text-transform: uppercase; font-size: 0.85rem; box-sizing: border-box;">
                 ${totals.hasCoupon ? `
-                    <button type="button" class="btn btn-outline btn-sm" onclick="removeAppliedCoupon()" style="color: #DC2626; border-color: #FECACA;">Remove</button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="removeAppliedCoupon()" style="color: #DC2626; border-color: #FECACA; flex-shrink: 0; padding: 8px 14px;">Remove</button>
                 ` : `
-                    <button type="button" class="btn btn-primary btn-sm" onclick="applyCouponCode()">Apply</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="applyCouponCode()" style="flex-shrink: 0; padding: 8px 16px;">Apply</button>
                 `}
             </div>
             <div id="coupon-feedback-msg" style="font-size: 0.78rem; margin-top: 6px;"></div>

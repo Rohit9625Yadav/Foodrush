@@ -363,23 +363,22 @@
     }
 
     .navbar {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100%;
+        height: auto;
+        box-sizing: border-box;
+    }
+
+    .navbar:has(.header-location-pill) {
         display: grid !important;
         grid-template-columns: auto 1fr;
         grid-template-areas:
             "logo actions"
             "location location";
-        align-items: center;
         row-gap: 8px;
         column-gap: 10px;
-        width: 100%;
-        height: auto;
-    }
-
-    .navbar:not(:has(.header-location-pill)) {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        row-gap: 0;
     }
 
     .logo {
@@ -835,6 +834,114 @@
         padding: 9px 16px;
     }
 
+    /* Checkout Page Mobile Optimization */
+    .checkout-layout {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .checkout-box {
+        padding: 16px 14px;
+        margin-bottom: 16px;
+        border-radius: var(--radius-md);
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    .box-title {
+        font-size: 1.08rem;
+        margin-bottom: 14px;
+        gap: 8px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .form-group {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .form-group.col-span-2 {
+        grid-column: span 1;
+    }
+
+    .form-label {
+        font-size: 0.84rem;
+    }
+
+    .form-control {
+        width: 100%;
+        max-width: 100%;
+        padding: 11px 13px;
+        font-size: 0.88rem;
+        box-sizing: border-box;
+    }
+
+    .delivery-options-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .delivery-radio-card {
+        padding: 12px 14px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .delivery-radio-card strong {
+        font-size: 0.9rem;
+    }
+
+    .payment-tabs {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        width: 100%;
+        margin-bottom: 14px;
+    }
+
+    .payment-tab {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 11px 14px;
+        gap: 12px;
+        font-size: 0.88rem;
+        text-align: left;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .payment-tab i {
+        font-size: 1.15rem;
+    }
+
+    .payment-content-pane {
+        padding: 13px 12px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    #place-order-btn {
+        width: 100%;
+        margin-top: 14px;
+        padding: 13px 18px !important;
+        font-size: 1rem !important;
+        font-weight: 700;
+        border-radius: var(--radius-md);
+        box-sizing: border-box;
+        box-shadow: 0 4px 14px rgba(255, 87, 34, 0.35);
+    }
+
     /* Modals on Mobile */
     .location-modal-backdrop,
     .modal-backdrop {
@@ -1011,5 +1118,31 @@
 
     .cart-product-name {
         font-size: 0.88rem;
+    }
+
+    /* Checkout Compact Smartphone Rules */
+    .checkout-box {
+        padding: 14px 10px;
+    }
+
+    .box-title {
+        font-size: 1rem;
+    }
+
+    .form-control {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .payment-tab {
+        padding: 10px 12px;
+        font-size: 0.84rem;
+        gap: 10px;
+    }
+
+    #place-order-btn {
+        padding: 12px 14px !important;
+        font-size: 0.94rem !important;
+        border-radius: var(--radius-sm);
     }
 }
