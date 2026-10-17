@@ -33,7 +33,22 @@ function initMobileNav() {
     const drawer = document.getElementById('mobile-nav-drawer');
     const overlay = document.getElementById('drawer-overlay');
 
-    if (!drawer || !hamburgerBtn) return;
+    if (!drawer) return;
+
+    // Ensure drawer footer has both Order Food and Checkout buttons with proper safe-area spacing
+    const footer = drawer.querySelector('.drawer-footer');
+    if (footer) {
+        footer.innerHTML = `
+            <a href="/menu/" class="btn btn-primary btn-block" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700;">
+                <i class="fa-solid fa-utensils"></i> Order Food
+            </a>
+            <a href="/checkout/" class="btn btn-outline btn-block" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; border-color: var(--primary); color: var(--primary);">
+                <i class="fa-solid fa-bag-shopping"></i> Proceed to Checkout
+            </a>
+        `;
+    }
+
+    if (!hamburgerBtn) return;
 
     function openDrawer() {
         drawer.classList.add('active');

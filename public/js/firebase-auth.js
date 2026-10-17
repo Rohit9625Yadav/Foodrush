@@ -465,25 +465,18 @@ function resumePendingActionAfterLogin() {
 export function updateUIForAuthState(user) {
     const isAdmin = Boolean(user && user.isLoggedIn && user.email && ['rohit09ydv@gmail.com', 'admin@foodrush.com'].includes(user.email.toLowerCase()));
 
-    // 1. Update navigation badges
+    // 1. Keep Top Navigation Header compact and responsive (no crowding)
     const authContainers = document.querySelectorAll('.auth-nav-container');
     authContainers.forEach(container => {
         if (user && user.isLoggedIn) {
             const initial = user.name ? user.name.charAt(0).toUpperCase() : 'U';
-            const adminNavBtn = isAdmin ? `
-                <a href="/admin/" class="btn btn-sm" style="background: linear-gradient(135deg, #FF5722, #E64A19); color: #fff; font-weight: 700; border-radius: 20px; padding: 5px 12px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(255,87,34,0.3); font-size: 0.8rem;" title="Open Admin Control Center">
-                    <i class="fa-solid fa-shield-halved"></i> Admin Panel
-                </a>
-            ` : '';
-
             container.innerHTML = `
                 <div class="user-logged-in-wrap" style="display: flex; align-items: center; gap: 8px;">
-                    ${adminNavBtn}
                     <a href="/auth/" class="user-profile-badge" title="My Account (${user.email})">
-                        <div class="user-avatar" style="background: #4285F4; width: 34px; height: 34px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                        <div class="user-avatar" style="background: #4285F4; width: 32px; height: 32px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;">
                             ${initial}
                         </div>
-                        <span style="font-weight: 600; font-size: 0.9rem;">${user.name.split(' ')[0]}</span>
+                        <span style="font-weight: 600; font-size: 0.88rem;">${user.name.split(' ')[0]}</span>
                     </a>
                     <button type="button" class="btn btn-outline btn-sm logout-nav-btn" style="padding: 4px 10px; font-size: 0.8rem; border-color: var(--border-color);" title="Log out">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -506,6 +499,9 @@ export function updateUIForAuthState(user) {
             `;
         }
     });
+
+    // 2. Put Admin Panel link in the MIDDLE of Menu Bar & Mobile Drawer (ONLY for Admin)
+    ensureAdminMenuItem(isAdmin);
 
     // 2. Update auth.html session card if present
     const sessionCard = document.getElementById('logged-in-session-view');
@@ -552,6 +548,69 @@ export function updateUIForAuthState(user) {
         if (nameInput && !nameInput.value) nameInput.value = user.name;
         if (emailInput && !emailInput.value) emailInput.value = user.email;
     }
+}
+
+/**
+ * Injects or displays Admin Panel link in the MIDDLE of desktop and mobile menu bar
+ * Only visible when authenticated user is an authorized administrator.
+ */
+function ensureAdminMenuItem(isAdmin) {
+    // 1. Desktop Menu Links (.nav-links)
+    document.querySelectorAll('.nav-links').forEach(navLinks => {
+        let adminItem = navLinks.querySelector('.admin-nav-menu-link');
+        if (isAdmin) {
+            if (!adminItem) {
+                adminItem = document.createElement('a');
+                adminItem.href = '/admin/';
+                adminItem.className = 'nav-item admin-nav-menu-link';
+                adminItem.style.color = '#FF5722';
+                adminItem.style.fontWeight = '700';
+                adminItem.innerHTML = '<i class="fa-solid fa-shield-halved" style="color: #FF5722; margin-right: 5px;"></i> Admin Panel';
+
+                // Insert right in the middle (after "Menu" item)
+                const menuLink = navLinks.querySelector('a[href*="/menu/"]') || navLinks.children[1];
+                if (menuLink && menuLink.nextSibling) {
+                    navLinks.insertBefore(adminItem, menuLink.nextSibling);
+                } else {
+                    navLinks.appendChild(adminItem);
+                }
+            }
+            adminItem.style.display = 'inline-flex';
+            adminItem.style.alignItems = 'center';
+        } else if (adminItem) {
+            adminItem.style.display = 'none';
+        }
+    });
+
+    // 2. Mobile Drawer Menu Links (.mobile-links)
+    document.querySelectorAll('.mobile-links').forEach(mobileLinks => {
+        let mobileAdminItem = mobileLinks.querySelector('.admin-mobile-drawer-link');
+        if (isAdmin) {
+            if (!mobileAdminItem) {
+                mobileAdminItem = document.createElement('a');
+                mobileAdminItem.href = '/admin/';
+                mobileAdminItem.className = 'mobile-nav-item admin-mobile-drawer-link';
+                mobileAdminItem.style.color = '#FF5722';
+                mobileAdminItem.style.fontWeight = '700';
+                mobileAdminItem.style.background = '#FFF3EE';
+                mobileAdminItem.style.borderRadius = '10px';
+                mobileAdminItem.style.padding = '10px 14px';
+                mobileAdminItem.style.border = '1px solid rgba(255, 87, 34, 0.2)';
+                mobileAdminItem.innerHTML = '<i class="fa-solid fa-shield-halved" style="color: #FF5722; width: 20px;"></i> Admin Panel';
+
+                // Insert right in the middle (after "Menu" item)
+                const menuLink = mobileLinks.querySelector('a[href*="/menu/"]') || mobileLinks.children[2];
+                if (menuLink && menuLink.nextSibling) {
+                    mobileLinks.insertBefore(mobileAdminItem, menuLink.nextSibling);
+                } else {
+                    mobileLinks.appendChild(mobileAdminItem);
+                }
+            }
+            mobileAdminItem.style.display = 'flex';
+        } else if (mobileAdminItem) {
+            mobileAdminItem.style.display = 'none';
+        }
+    });
 }
 
 /**
