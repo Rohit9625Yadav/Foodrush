@@ -58,6 +58,10 @@
                     <i class="fa-solid fa-map-location-dot"></i>
                     <span>Delivery Zones & PINs</span>
                 </button>
+                <button type="button" class="admin-nav-btn" data-tab="customers">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Customer Logins</span>
+                </button>
             </nav>
 
             <div class="admin-sidebar-footer">
@@ -132,6 +136,15 @@
                         <div>
                             <div class="admin-stat-label">Configured PIN Zones</div>
                             <div class="admin-stat-value" id="stat-total-zones">0</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card" style="cursor: pointer;" onclick="switchAdminTab('customers')">
+                        <div class="admin-stat-icon" style="background: #FEF3C7; color: #D97706;">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="admin-stat-label">Customer Logins</div>
+                            <div class="admin-stat-value" id="stat-total-customers">0</div>
                         </div>
                     </div>
                 </div>
@@ -269,6 +282,48 @@
                                     </tr>
                                 </thead>
                                 <tbody id="admin-locations-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 5: REGISTERED CUSTOMERS & USER LOGINS (STRICTLY OWNER ONLY) -->
+                <section id="admin-tab-customers" class="admin-tab-panel" style="display: none;">
+                    <div class="admin-panel-card">
+                        <div class="admin-panel-header" style="flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin: 0;"><i class="fa-solid fa-users-gear" style="color: var(--primary);"></i> Registered Customers & Login Data</h3>
+                                <p style="color: var(--text-muted); font-size: 0.85rem; margin: 4px 0 0;">
+                                    Real-time list of all users who have signed in via Google OAuth or Mobile OTP. Strictly private & accessible only by Admin (<code>rohit09ydv@gmail.com</code>).
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="text" id="admin-customer-search" class="form-control" placeholder="Search customer by name or email..." style="max-width: 280px;">
+                                <button type="button" class="btn btn-outline btn-sm" id="btn-refresh-customers">
+                                    <i class="fa-solid fa-rotate"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="admin-table-responsive" style="margin-top: 15px;">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Email / Contact</th>
+                                        <th>Login Method</th>
+                                        <th>Last Login Time</th>
+                                        <th>User UID</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-customers-tbody">
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                                            <i class="fa-solid fa-spinner fa-spin"></i> Loading customer data...
+                                        </td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>

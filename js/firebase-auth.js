@@ -78,6 +78,7 @@ if (auth) {
 
             localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(sessionUser));
             updateUIForAuthState(sessionUser);
+            recordUserSession(sessionUser);
 
             // Check if there is a pending action waiting to resume
             resumePendingActionAfterLogin();
@@ -110,6 +111,7 @@ if (auth) {
                 };
                 localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(sessionUser));
                 updateUIForAuthState(sessionUser);
+                recordUserSession(sessionUser);
                 if (typeof showToast === 'function') {
                     showToast(`🎉 Welcome, ${sessionUser.name}!`, 'primary');
                 }
@@ -120,6 +122,24 @@ if (auth) {
             console.warn('Redirect auth notice:', err.message);
         });
     } catch (e) {}
+}
+
+/**
+ * Synchronize logged in user to Firestore and Admin Customer database
+ */
+function recordUserSession(sessionUser) {
+    if (!sessionUser) return;
+    try {
+        if (typeof window.FoodRushStore?.syncUserToCloud === 'function') {
+            window.FoodRushStore.syncUserToCloud(sessionUser);
+        } else {
+            import('./store-data.js').then(mod => {
+                if (mod?.FoodRushStore?.syncUserToCloud) {
+                    mod.FoodRushStore.syncUserToCloud(sessionUser);
+                }
+            }).catch(() => {});
+        }
+    } catch(e) {}
 }
 
 /**
@@ -172,6 +192,7 @@ export async function signInWithGoogle() {
 
         localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(sessionUser));
         updateUIForAuthState(sessionUser);
+        recordUserSession(sessionUser);
 
         if (typeof showToast === 'function') {
             showToast(`👋 Welcome, ${sessionUser.name}!`, 'primary');

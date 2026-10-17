@@ -10,6 +10,7 @@ import { FoodRushStore } from "./store-data.js";
 
 let adminRestaurants = [];
 let adminOffers = [];
+let adminCustomers = [];
 let verifiedAdminUser = null;
 let currentMenuBuilderItems = [];
 
@@ -110,17 +111,20 @@ function verifyAdminAccess() {
 
 async function loadAllAdminData() {
     try {
-        const [restaurants, offers] = await Promise.all([
+        const [restaurants, offers, customers] = await Promise.all([
             FoodRushStore.getRestaurants(),
-            FoodRushStore.getOffers()
+            FoodRushStore.getOffers(),
+            FoodRushStore.getUsers ? FoodRushStore.getUsers() : []
         ]);
         adminRestaurants = restaurants || [];
         adminOffers = offers || [];
+        adminCustomers = customers || [];
         renderAdminStats();
         renderOverviewTab();
         renderRestaurantsTable();
         renderOffersTable();
         renderLocationsTable();
+        renderCustomersTable();
         populateRestaurantDropdownForOffers();
     } catch (err) {
         console.error('[FoodRush Admin] Error loading data:', err);
@@ -144,10 +148,16 @@ function renderAdminStats() {
         }
     });
 
-    document.getElementById('stat-total-restaurants').textContent = totalRests;
-    document.getElementById('stat-active-stores').textContent = activeStores;
-    document.getElementById('stat-active-offers').textContent = activeOffers;
-    document.getElementById('stat-total-zones').textContent = pinSet.size;
+    const restEl = document.getElementById('stat-total-restaurants');
+    if (restEl) restEl.textContent = totalRests;
+    const storeEl = document.getElementById('stat-active-stores');
+    if (storeEl) storeEl.textContent = activeStores;
+    const offerEl = document.getElementById('stat-active-offers');
+    if (offerEl) offerEl.textContent = activeOffers;
+    const zoneEl = document.getElementById('stat-total-zones');
+    if (zoneEl) zoneEl.textContent = pinSet.size;
+    const customerEl = document.getElementById('stat-total-customers');
+    if (customerEl) customerEl.textContent = adminCustomers.length;
 }
 
 function setupSidebarTabs() {
@@ -167,15 +177,20 @@ window.switchAdminTab = function (tabName) {
         overview: 'Dashboard Overview',
         restaurants: 'Restaurant & Store Management',
         offers: 'Offers & Coupons Management',
-        locations: 'Delivery Zones & Location Settings'
+        locations: 'Delivery Zones & Location Settings',
+        customers: 'Registered Customers & Logins'
     };
     const titleEl = document.getElementById('admin-page-title');
     if (titleEl) titleEl.textContent = titles[tabName] || 'Admin Dashboard';
 
-    ['overview', 'restaurants', 'offers', 'locations'].forEach(t => {
+    ['overview', 'restaurants', 'offers', 'locations', 'customers'].forEach(t => {
         const panel = document.getElementById(`admin-tab-${t}`);
         if (panel) panel.style.display = (t === tabName) ? 'block' : 'none';
     });
+
+    if (tabName === 'customers') {
+        renderCustomersTable();
+    }
 };
 
 function renderOverviewTab() {
@@ -234,6 +249,42 @@ function setupSearchAndFilterListeners() {
             el.addEventListener('change', renderOffersTable);
         }
     });
+
+    const customerSearch = document.getElementById('admin-customer-search');
+    if (customerSearch) {
+        customerSearch.addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase().trim();
+            const filtered = adminCustomers.filter(u => {
+                const name = (u.name || '').toLowerCase();
+                const email = (u.email || '').toLowerCase();
+                const phone = (u.phone || '').toLowerCase();
+                const uid = (u.uid || '').toLowerCase();
+                return name.includes(q) || email.includes(q) || phone.includes(q) || uid.includes(q);
+            });
+            renderCustomersTable(filtered);
+        });
+    }
+
+    const refreshCustomersBtn = document.getElementById('btn-refresh-customers');
+    if (refreshCustomersBtn) {
+        refreshCustomersBtn.addEventListener('click', async () => {
+            refreshCustomersBtn.disabled = true;
+            refreshCustomersBtn.innerHTML = `<i class="fa-solid fa-rotate fa-spin"></i> Refreshing...`;
+            try {
+                if (FoodRushStore.getUsers) {
+                    adminCustomers = await FoodRushStore.getUsers();
+                    renderCustomersTable();
+                    renderAdminStats();
+                    if (typeof window.showToast === 'function') {
+                        window.showToast(`Updated! ${adminCustomers.length} registered customers loaded.`, 'success');
+                    }
+                }
+            } finally {
+                refreshCustomersBtn.disabled = false;
+                refreshCustomersBtn.innerHTML = `<i class="fa-solid fa-rotate"></i> Refresh`;
+            }
+        });
+    }
 }
 
 function renderRestaurantsTable() {
@@ -782,4 +833,76 @@ function setupAdminForms() {
             }
         });
     }
+}
+
+/**
+ * 6. REGISTERED CUSTOMERS TABLE (STRICTLY OWNER ONLY)
+ */
+function renderCustomersTable(usersToRender = null) {
+    const tbody = document.getElementById('admin-customers-tbody');
+    if (!tbody) return;
+
+    const list = usersToRender !== null ? usersToRender : adminCustomers;
+
+    if (!list || list.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                    <i class="fa-solid fa-users-slash" style="font-size: 2.2rem; margin-bottom: 12px; display: block; opacity: 0.35;"></i>
+                    <strong style="font-size: 1.05rem; color: var(--text-main);">No Customer Logins Yet</strong>
+                    <p style="font-size: 0.85rem; margin: 6px 0 0;">Users who sign in via Google OAuth or Mobile OTP will automatically appear here in real time.</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = list.map((user, idx) => {
+        const photoHtml = user.photoURL 
+            ? `<img src="${user.photoURL}" alt="${user.name || 'User'}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-light);">`
+            : `<div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #FF8A65); color: #FFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem;">${(user.name || 'U').charAt(0).toUpperCase()}</div>`;
+
+        const isGoogle = user.provider === 'google' || (!user.phone && user.email);
+        const providerBadge = isGoogle 
+            ? `<span style="display: inline-flex; align-items: center; gap: 5px; background: #E8F0FE; color: #1967D2; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;"><i class="fa-brands fa-google"></i> Google</span>`
+            : `<span style="display: inline-flex; align-items: center; gap: 5px; background: #ECFDF5; color: #047857; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;"><i class="fa-solid fa-phone"></i> Mobile Phone</span>`;
+
+        const timeStr = user.lastLoginFormatted || (user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString('en-IN') : 'Recent');
+        const shortUid = (user.uid || '').slice(0, 14);
+
+        return `
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        ${photoHtml}
+                        <div>
+                            <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">${user.name || 'Customer'}</div>
+                            <div style="font-size: 0.76rem; color: var(--text-muted);">Customer #${idx + 1}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-main);">${user.email || '—'}</div>
+                    ${user.phone ? `<div style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-phone" style="font-size: 0.7rem;"></i> ${user.phone}</div>` : ''}
+                </td>
+                <td>
+                    ${providerBadge}
+                </td>
+                <td>
+                    <div style="font-size: 0.88rem; font-weight: 600; color: var(--text-main);">${timeStr}</div>
+                    <div style="font-size: 0.74rem; color: #10B981;"><i class="fa-solid fa-clock-rotate-left"></i> Recorded</div>
+                </td>
+                <td>
+                    <code style="background: var(--bg-main); padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; color: #475569; border: 1px solid var(--border-color);" title="${user.uid}">
+                        ${shortUid}...
+                    </code>
+                </td>
+                <td>
+                    <span style="display: inline-flex; align-items: center; gap: 5px; background: #D1FAE5; color: #065F46; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;">
+                        <i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Verified User
+                    </span>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }

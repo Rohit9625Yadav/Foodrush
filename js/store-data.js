@@ -1261,6 +1261,94 @@ export async function uploadImageFile(file, folder = 'restaurants') {
     });
 }
 
+/**
+ * Synchronize authenticated customer to Cloud Firestore & local cache
+ */
+async function syncUserToCloud(userData) {
+    if (!userData || !userData.uid) return;
+
+    const formattedTime = new Date().toLocaleString('en-IN', { 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true 
+    });
+
+    const userPayload = {
+        uid: userData.uid,
+        name: userData.name || userData.displayName || 'FoodRush Customer',
+        email: userData.email || '',
+        phone: userData.phone || userData.phoneNumber || '',
+        photoURL: userData.photoURL || '',
+        provider: userData.provider || (userData.email ? 'google' : 'phone'),
+        lastLoginAt: new Date().toISOString(),
+        lastLoginFormatted: formattedTime
+    };
+
+    // Cache locally for instant access
+    try {
+        const USERS_CACHE_KEY = 'foodrush_users_cache_v2';
+        let localUsers = [];
+        try {
+            localUsers = JSON.parse(localStorage.getItem(USERS_CACHE_KEY)) || [];
+        } catch(e) {}
+        const idx = localUsers.findIndex(u => u.uid === userData.uid || (u.email && u.email === userData.email));
+        if (idx >= 0) {
+            localUsers[idx] = { ...localUsers[idx], ...userPayload };
+        } else {
+            localUsers.unshift(userPayload);
+        }
+        localStorage.setItem(USERS_CACHE_KEY, JSON.stringify(localUsers));
+    } catch(e) {}
+
+    // Cloud Firestore persistence
+    if (db) {
+        try {
+            const userDocRef = doc(db, 'users', userData.uid);
+            await setDoc(userDocRef, userPayload, { merge: true });
+        } catch(err) {
+            console.warn('[FoodRush Store] Firestore sync user notice:', err.message);
+        }
+    }
+}
+
+/**
+ * Fetch all registered customers from Firestore & local cache
+ */
+async function fetchUsers() {
+    let cloudUsers = [];
+    if (db) {
+        try {
+            const snap = await getDocs(collection(db, 'users'));
+            snap.forEach(d => {
+                cloudUsers.push(d.data());
+            });
+        } catch(e) {
+            console.warn('[FoodRush Store] Error fetching users from Firestore:', e);
+        }
+    }
+
+    let localUsers = [];
+    try {
+        localUsers = JSON.parse(localStorage.getItem('foodrush_users_cache_v2')) || [];
+    } catch(e) {}
+
+    const map = new Map();
+    cloudUsers.forEach(u => map.set(u.uid || u.email, u));
+    localUsers.forEach(u => {
+        const key = u.uid || u.email;
+        if (!map.has(key)) {
+            map.set(key, u);
+        }
+    });
+
+    return Array.from(map.values()).sort((a, b) => {
+        return new Date(b.lastLoginAt || 0) - new Date(a.lastLoginAt || 0);
+    });
+}
+
 // Export unified FoodRushStore object for ES module imports AND attach to window
 export const FoodRushStore = {
     fetchRestaurants,
@@ -1287,7 +1375,10 @@ export const FoodRushStore = {
     deleteSavedAddress,
     calculateDistanceKm,
     checkRestaurantDeliverability,
-    uploadImageFile
+    uploadImageFile,
+    syncUserToCloud,
+    fetchUsers,
+    getUsers: fetchUsers
 };
 
 window.FoodRushStore = FoodRushStore;
