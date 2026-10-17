@@ -1517,6 +1517,9 @@ button {
     grid-template-columns: 1.35fr 0.65fr;
     gap: 28px;
     align-items: start;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .cart-items-card, .cart-summary-card {
@@ -1527,6 +1530,9 @@ button {
     border: 1px solid var(--border-light);
     min-width: 0;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .cart-table {

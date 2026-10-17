@@ -216,7 +216,7 @@ function renderCartPage() {
                             </div>
                         </td>
                         <td class="cart-col-subtotal">
-                            <span class="mobile-subtotal-label">Item Total:</span>
+                            <span class="mobile-subtotal-label">Total:</span>
                             <strong>₹${Number(item.price * item.quantity).toFixed(2)}</strong>
                         </td>
                         <td class="cart-col-remove">
@@ -274,7 +274,7 @@ function renderCartPage() {
         ` : ''}
 
         <div class="coupon-box" style="margin-top: 14px;">
-            <input type="text" id="coupon-input-field" class="coupon-input" placeholder="Enter coupon (e.g. FOODRUSH20, FIRST50)" value="${totals.couponCode}" style="text-transform: uppercase;">
+            <input type="text" id="coupon-input-field" class="coupon-input" placeholder="Enter coupon code (e.g. FOODRUSH20)" value="${totals.couponCode}" style="text-transform: uppercase;">
             ${totals.hasCoupon ? `
                 <button type="button" class="btn btn-outline btn-sm" onclick="removeAppliedCoupon()" style="color: #DC2626; border-color: #FECACA;">Remove</button>
             ` : `
