@@ -75,36 +75,23 @@ const otpStore = new Map();
 // Users Database (Dynamic persistent memory storage in server)
 const usersStore = [];
 
-// Configure Email Transporter
+// Configure Email Transporter using Real Gmail SMTP
+const GMAIL_USER = (process.env.EMAIL_USER || 'rohit09ydv@gmail.com').trim();
+const GMAIL_PASS = (process.env.EMAIL_PASS || 'rwsearwnmfkxijkl').replace(/\s+/g, '').trim();
+
 let transporter = null;
 
 async function getTransporter() {
     if (transporter) return transporter;
 
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        // Real Gmail SMTP Transporter
-        transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-        console.log('✅ Configured Real Gmail SMTP Transporter with:', process.env.EMAIL_USER);
-    } else {
-        // Create an automated real Ethereal SMTP test account
-        const testAccount = await nodemailer.createTestAccount();
-        transporter = nodemailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
-            secure: false,
-            auth: {
-                user: testAccount.user,
-                pass: testAccount.pass
-            }
-        });
-        console.log('⚡ Auto-generated live Ethereal test inbox for real email testing.');
-    }
+    transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: GMAIL_USER,
+            pass: GMAIL_PASS
+        }
+    });
+    console.log('✅ Real Gmail SMTP Transporter initialized for:', GMAIL_USER);
     return transporter;
 }
 
@@ -120,7 +107,7 @@ app.get('/api/health', (req, res) => {
 });
 
 /**
- * 1. Send Real Email OTP
+ * 1. Send Real Email OTP to User's Gmail Inbox
  */
 app.post('/api/auth/send-otp', async (req, res) => {
     try {
@@ -140,40 +127,36 @@ app.post('/api/auth/send-otp', async (req, res) => {
             name: name || 'Foodie'
         });
 
-        // Ultra-Clean Natural Transactional Email (Bypasses Gmail Spam Filters)
+        // Ultra-Clean Professional FoodRush Email
         const mailOptions = {
-            from: `"FoodRush" <${process.env.EMAIL_USER}>`,
+            from: `"FoodRush" <${GMAIL_USER}>`,
             to: email,
-            subject: `FoodRush verification code: ${otp}`,
+            subject: `FoodRush Verification Code: ${otp}`,
             text: `Hi ${name || 'there'},\n\nYour FoodRush verification code is: ${otp}\n\nThis code will expire in 5 minutes.\n\nThank you,\nFoodRush Team`,
             html: `
-                <div style="font-family: Arial, sans-serif; font-size: 15px; color: #222222; line-height: 1.6; max-width: 480px; padding: 10px 0;">
+                <div style="font-family: Arial, sans-serif; font-size: 15px; color: #222222; line-height: 1.6; max-width: 480px; padding: 24px; border: 1.5px solid #FFD8CC; border-radius: 12px; background: #FFFFFF; margin: 0 auto;">
+                    <div style="margin-bottom: 20px;">
+                        <span style="font-size: 26px; font-weight: 800; color: #FF5722; letter-spacing: -0.5px;">🍔 FoodRush</span>
+                    </div>
                     <p style="margin: 0 0 14px 0;">Hi <strong>${name || 'there'}</strong>,</p>
                     <p style="margin: 0 0 14px 0;">Your FoodRush verification code is:</p>
-                    <div style="background-color: #f4f6f8; border-radius: 6px; padding: 14px 20px; text-align: center; margin: 16px 0; font-size: 26px; font-weight: bold; letter-spacing: 5px; color: #ff5722; font-family: monospace;">
+                    <div style="background-color: #FFF3EE; border-radius: 8px; padding: 16px 24px; text-align: center; margin: 20px 0; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #FF5722; font-family: monospace; border: 1.5px dashed #FF7A50;">
                         ${otp}
                     </div>
-                    <p style="margin: 0 0 14px 0; font-size: 13px; color: #666666;">This code is valid for 5 minutes. If you did not request this, you can safely ignore this email.</p>
-                    <p style="margin: 20px 0 0 0; font-size: 13px; color: #888888; border-top: 1px solid #eeeeee; padding-top: 12px;">FoodRush Fast Food Delivery</p>
+                    <p style="margin: 0 0 14px 0; font-size: 13px; color: #666666;">This code is valid for 5 minutes. Please enter this code on the FoodRush verification screen to complete your registration.</p>
+                    <p style="margin: 20px 0 0 0; font-size: 12px; color: #888888; border-top: 1px solid #EEEEEE; padding-top: 14px;">FoodRush Fast Food Delivery Platform</p>
                 </div>
             `
         };
 
         const mailTransporter = await getTransporter();
         const info = await mailTransporter.sendMail(mailOptions);
+        console.log(`📩 Real Email Sent directly to ${email}! Message ID: ${info.messageId}`);
 
-        let previewUrl = null;
-        if (nodemailer.getTestMessageUrl(info)) {
-            previewUrl = nodemailer.getTestMessageUrl(info);
-            console.log('📩 Real Email Sent! Preview URL:', previewUrl);
-        } else {
-            console.log(`📩 Real Email Sent directly to ${email}! Message ID: ${info.messageId} | OTP: ${otp}`);
-        }
-
+        // Keep OTP completely secret on the server - do NOT send it in the JSON response!
         res.json({
             success: true,
-            otp: otp,
-            message: `OTP sent successfully to ${email}. Please check your inbox.`
+            message: `Verification code sent to ${email}. Please check your Gmail inbox.`
         });
 
     } catch (error) {

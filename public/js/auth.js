@@ -259,18 +259,9 @@ async function dispatchRegistrationOtp(email, name) {
     const regSubmitBtn = document.getElementById('reg-submit-btn');
     if (regSubmitBtn) {
         regSubmitBtn.disabled = true;
-        regSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating OTP code...';
+        regSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending real OTP to your Gmail...';
     }
 
-    // Always generate a reliable 6-digit OTP
-    const clientOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    if (pendingRegistrationUser) {
-        pendingRegistrationUser.otp = clientOtp;
-    }
-
-    let activeOtp = clientOtp;
-
-    // Send Real Email OTP to user's Gmail via backend Express server
     try {
         const res = await fetch(`${API_BASE}/api/auth/send-otp`, {
             method: 'POST',
@@ -278,35 +269,34 @@ async function dispatchRegistrationOtp(email, name) {
             body: JSON.stringify({ email, name })
         });
 
-        if (res.ok) {
-            const data = await res.json();
-            if (data && data.otp) {
-                activeOtp = data.otp;
-                if (pendingRegistrationUser) pendingRegistrationUser.otp = data.otp;
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            if (typeof showToast === 'function') {
+                showToast(`✉️ 6-digit verification code sent to ${email}! Please check your Gmail inbox.`, 'primary');
             }
+            openOtpModal(email, 'email');
+        } else {
+            throw new Error(data.message || 'Failed to dispatch email verification code');
         }
     } catch (err) {
-        console.warn('Backend OTP notice (using direct client verification):', err.message);
-    }
-
-    if (typeof showToast === 'function') {
-        showToast(`🔑 Your FoodRush Verification Code is: ${activeOtp}`, 'primary', 8000);
-    }
-
-    openOtpModal(email, 'email', activeOtp);
-
-    if (regSubmitBtn) {
-        regSubmitBtn.disabled = false;
-        regSubmitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send OTP to Gmail & Verify';
+        console.error('Email OTP dispatch error:', err);
+        if (typeof showToast === 'function') {
+            showToast(`❌ ${err.message}`, 'danger');
+        }
+    } finally {
+        if (regSubmitBtn) {
+            regSubmitBtn.disabled = false;
+            regSubmitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send OTP to Gmail & Verify';
+        }
     }
 }
 
-function openOtpModal(recipient, type = 'email', otp = '') {
+function openOtpModal(recipient, type = 'email') {
     const modal = document.getElementById('otp-verification-modal');
     const recipientSpan = document.getElementById('otp-recipient-email');
     const modalTitle = document.getElementById('otp-modal-title');
     const iconWrap = document.getElementById('otp-icon-wrap');
-    const otpBadge = document.getElementById('otp-display-badge');
     if (!modal) return;
 
     if (modalTitle) modalTitle.textContent = 'Gmail OTP Verification';
@@ -316,11 +306,6 @@ function openOtpModal(recipient, type = 'email', otp = '') {
 
     if (recipientSpan) {
         recipientSpan.textContent = recipient;
-    }
-
-    const currentOtp = otp || pendingRegistrationUser?.otp || '123456';
-    if (otpBadge) {
-        otpBadge.textContent = currentOtp;
     }
 
     const otpFields = modal.querySelectorAll('.otp-field');
@@ -336,21 +321,6 @@ function openOtpModal(recipient, type = 'email', otp = '') {
 
     startOtpTimer();
 }
-
-window.autoFillOtpCode = function() {
-    const code = pendingRegistrationUser?.otp || document.getElementById('otp-display-badge')?.textContent?.trim() || '';
-    if (!code || code.length !== 6) return;
-
-    const modal = document.getElementById('otp-verification-modal');
-    if (!modal) return;
-
-    const otpFields = modal.querySelectorAll('.otp-field');
-    code.split('').forEach((digit, i) => {
-        if (otpFields[i]) otpFields[i].value = digit;
-    });
-
-    submitOtpVerification();
-};
 
 function closeOtpModal() {
     const modal = document.getElementById('otp-verification-modal');
@@ -442,7 +412,7 @@ async function submitOtpVerification() {
 
     if (enteredOtp.length < 6) {
         if (typeof showToast === 'function') {
-            showToast('Please enter the complete 6-digit code', 'warning');
+            showToast('Please enter the complete 6-digit code sent to your Gmail', 'warning');
         }
         return;
     }
@@ -453,9 +423,6 @@ async function submitOtpVerification() {
         verifyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
     }
 
-    let isSuccess = false;
-
-    // Check with backend API if available
     try {
         const res = await fetch(`${API_BASE}/api/auth/verify-otp`, {
             method: 'POST',
@@ -468,83 +435,83 @@ async function submitOtpVerification() {
             })
         });
 
-        if (res.ok) {
-            const data = await res.json();
-            if (data && data.success) {
-                isSuccess = true;
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            if (typeof showToast === 'function') {
+                showToast(`❌ ${data.message || 'Invalid code! Please check the code in your Gmail.'}`, 'danger');
             }
+            otpFields.forEach(f => f.style.borderColor = 'var(--danger)');
+            setTimeout(() => {
+                otpFields.forEach(f => f.style.borderColor = '');
+            }, 1500);
+            if (verifyBtn) {
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Verify & Register';
+            }
+            return;
         }
-    } catch (err) {}
 
-    // Client fallback check
-    if (!isSuccess && pendingRegistrationUser.otp && enteredOtp === pendingRegistrationUser.otp) {
-        isSuccess = true;
-    }
+        // Successfully verified & registered!
+        pendingRegistrationUser.isVerified = true;
+        const users = getUsersDatabase();
+        const newUser = {
+            name: pendingRegistrationUser.name,
+            email: pendingRegistrationUser.email.toLowerCase(),
+            phone: pendingRegistrationUser.phone || '',
+            password: pendingRegistrationUser.password,
+            uid: data.user?.uid || ('user-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 5)),
+            isVerified: true,
+            provider: 'email',
+            isLoggedIn: true
+        };
 
-    if (!isSuccess) {
+        const existingIdx = users.findIndex(u => u.email.toLowerCase() === newUser.email);
+        if (existingIdx !== -1) {
+            users[existingIdx] = newUser;
+        } else {
+            users.push(newUser);
+        }
+        saveUsersDatabase(users);
+
+        // Set Active Session so user is instantly logged in!
+        localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(newUser));
+
+        // Sync to Cloud Firestore & Admin Panel
+        if (typeof window.FoodRushStore?.syncUserToCloud === 'function') {
+            window.FoodRushStore.syncUserToCloud(newUser);
+        } else {
+            import('./store-data.js').then(mod => {
+                if (mod?.FoodRushStore?.syncUserToCloud) {
+                    mod.FoodRushStore.syncUserToCloud(newUser);
+                }
+            }).catch(() => {});
+        }
+
+        closeOtpModal();
+
+        // Reset register form
+        const regForm = document.getElementById('register-form');
+        if (regForm) regForm.reset();
+
         if (typeof showToast === 'function') {
-            showToast(`❌ Invalid OTP! Please check the code.`, 'danger');
+            showToast(`🎉 Verification Successful! Welcome, ${newUser.name}!`, 'primary');
         }
-        otpFields.forEach(f => f.style.borderColor = 'var(--danger)');
+
         setTimeout(() => {
-            otpFields.forEach(f => f.style.borderColor = '');
-        }, 1500);
+            window.location.href = '/home/';
+        }, 800);
+
+    } catch (err) {
+        console.error('Verification error:', err);
+        if (typeof showToast === 'function') {
+            showToast(`⚠️ Verification error: ${err.message}`, 'danger');
+        }
         if (verifyBtn) {
             verifyBtn.disabled = false;
             verifyBtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Verify & Register';
         }
-        return;
     }
-
-    // Successfully verified & registered!
-    pendingRegistrationUser.isVerified = true;
-    const users = getUsersDatabase();
-    const newUser = {
-        name: pendingRegistrationUser.name,
-        email: pendingRegistrationUser.email.toLowerCase(),
-        phone: pendingRegistrationUser.phone || '',
-        password: pendingRegistrationUser.password,
-        uid: 'user-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 5),
-        isVerified: true,
-        provider: 'email',
-        isLoggedIn: true
-    };
-
-    const existingIdx = users.findIndex(u => u.email.toLowerCase() === newUser.email);
-    if (existingIdx !== -1) {
-        users[existingIdx] = newUser;
-    } else {
-        users.push(newUser);
-    }
-    saveUsersDatabase(users);
-
-    // Set Active Session so user is instantly logged in!
-    localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(newUser));
-
-    // Sync to Cloud Firestore & Admin Panel
-    if (typeof window.FoodRushStore?.syncUserToCloud === 'function') {
-        window.FoodRushStore.syncUserToCloud(newUser);
-    } else {
-        import('./store-data.js').then(mod => {
-            if (mod?.FoodRushStore?.syncUserToCloud) {
-                mod.FoodRushStore.syncUserToCloud(newUser);
-            }
-        }).catch(() => {});
-    }
-
-    closeOtpModal();
-
-    // Reset register form
-    const regForm = document.getElementById('register-form');
-    if (regForm) regForm.reset();
-
-    if (typeof showToast === 'function') {
-        showToast(`🎉 Registration successful! Welcome, ${newUser.name}!`, 'primary');
-    }
-
-    setTimeout(() => {
-        window.location.href = '/home/';
-    }, 800);
 }
 
 /* --- OFFICIAL DIRECT GOOGLE OAUTH SIGN-IN (FIREBASE MODULAR SDK) --- */
