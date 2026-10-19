@@ -360,6 +360,45 @@
         height: auto;
         min-height: auto;
         padding: 8px 0 10px;
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .site-header.nav-hidden {
+        transform: translateY(-100%) !important;
+    }
+
+    .site-header.nav-visible {
+        transform: translateY(0) !important;
+    }
+
+    /* Orders Modal Mobile View */
+    .orders-modal-card {
+        max-width: 96vw;
+        max-height: 92vh;
+        border-radius: 16px;
+    }
+
+    .orders-modal-header {
+        padding: 14px 16px;
+    }
+
+    .orders-modal-toolbar {
+        padding: 10px 16px;
+    }
+
+    .orders-modal-body {
+        padding: 14px 16px;
+        gap: 12px;
+    }
+
+    .order-history-card {
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .my-orders-nav-btn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
     }
 
     .navbar {

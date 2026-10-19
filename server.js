@@ -561,9 +561,23 @@ app.post('/api/orders', (req, res) => {
  * 7. Admin Orders Fetch Endpoint
  */
 app.get('/api/orders', (req, res) => {
+    const { userId, email, phone } = req.query;
+    let list = serverOrdersStore;
+    if (userId || email || phone) {
+        const uId = (userId || '').trim();
+        const em = (email || '').toLowerCase().trim();
+        const ph = (phone || '').replace(/\D/g, '').trim();
+        list = list.filter(o => {
+            const matchesUid = uId && o.userId === uId;
+            const matchesEmail = em && (o.userEmail || '').toLowerCase() === em;
+            const orderPhone = (o.phone || (o.details && o.details.phone) || '').replace(/\D/g, '');
+            const matchesPhone = ph && orderPhone && (orderPhone === ph || orderPhone.includes(ph));
+            return matchesUid || matchesEmail || matchesPhone;
+        });
+    }
     res.json({
         success: true,
-        orders: serverOrdersStore
+        orders: list
     });
 });
 

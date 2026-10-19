@@ -250,13 +250,18 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 12px; margin-top: 24px;">
-                <button type="button" class="btn btn-primary btn-block" onclick="closeOrderModal()">
-                    Back to Home
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 24px;">
+                <button type="button" class="btn btn-primary btn-block my-orders-btn-trigger" onclick="closeOrderModal(); setTimeout(() => { window.openMyOrdersModal && window.openMyOrdersModal(); }, 150);" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700;">
+                    <i class="fa-solid fa-receipt"></i> Track in My Orders & History
                 </button>
-                <a href="/menu/" class="btn btn-outline btn-block">
-                    Explore More
-                </a>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-outline btn-block" onclick="closeOrderModal()">
+                        Back to Home
+                    </button>
+                    <a href="/menu/" class="btn btn-outline btn-block">
+                        Explore More
+                    </a>
+                </div>
             </div>
         </div>
     </div>

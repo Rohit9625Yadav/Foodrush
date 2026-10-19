@@ -85,8 +85,15 @@
                 <p style="color: #64748B; font-size: 0.8rem; font-family: monospace; margin-bottom: 24px;" id="session-user-uid"></p>
                 
                 <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <a href="/menu/" class="btn btn-primary btn-block">Order Delicious Food</a>
-                    <a href="/cart/" class="btn btn-outline btn-block">View Shopping Cart</a>
+                    <button type="button" class="btn btn-primary btn-block my-orders-btn-trigger" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700;">
+                        <i class="fa-solid fa-receipt"></i> View My Orders & History
+                    </button>
+                    <a href="/menu/" class="btn btn-outline btn-block" style="border-color: var(--primary); color: var(--primary); font-weight: 700;">
+                        <i class="fa-solid fa-utensils"></i> Order Delicious Food
+                    </a>
+                    <a href="/cart/" class="btn btn-outline btn-block">
+                        <i class="fa-solid fa-bag-shopping"></i> View Shopping Cart
+                    </a>
                     <button type="button" class="btn btn-secondary btn-block" onclick="handleUserLogout()">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
                     </button>
