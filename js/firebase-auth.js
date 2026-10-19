@@ -528,17 +528,16 @@ export function updateUIForAuthState(user) {
             if (emailEl) emailEl.innerHTML = `${user.email} <span class="badge badge-primary" style="font-size:0.75rem; margin-left: 6px;">${user.provider === 'google' ? 'Google Account' : 'Verified User'}</span>`;
             if (uidEl) uidEl.textContent = user.uid ? `User UID: ${user.uid}` : '';
 
-            // If Admin, show big Admin Dashboard button
+            // If Admin, show sleek & compact Admin Dashboard button
             let adminCardBtn = document.getElementById('session-admin-dashboard-btn');
             if (isAdmin) {
                 if (!adminCardBtn) {
                     adminCardBtn = document.createElement('a');
                     adminCardBtn.id = 'session-admin-dashboard-btn';
                     adminCardBtn.href = '/admin/';
-                    adminCardBtn.className = 'btn btn-primary btn-block btn-lg';
-                    adminCardBtn.style.background = 'linear-gradient(135deg, #FF5722, #D84315)';
-                    adminCardBtn.style.marginBottom = '12px';
-                    adminCardBtn.innerHTML = '<i class="fa-solid fa-shield-halved" style="margin-right: 8px;"></i> Open Admin Dashboard (Logins & Orders)';
+                    adminCardBtn.className = 'btn btn-block';
+                    adminCardBtn.style.cssText = 'background: #0F172A; color: #FFFFFF; padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18); transition: var(--transition-fast); border: 1px solid rgba(255,255,255,0.12); text-decoration: none;';
+                    adminCardBtn.innerHTML = '<i class="fa-solid fa-shield-halved" style="color: var(--primary); font-size: 0.95rem;"></i><span>Admin Dashboard</span><span style="background: rgba(255, 87, 34, 0.2); color: #FF7043; font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 8px; margin-left: 6px;">ADMIN</span>';
                     const actionsBox = sessionCard.querySelector('div[style*="flex-direction: column"]');
                     if (actionsBox) actionsBox.prepend(adminCardBtn);
                 }
