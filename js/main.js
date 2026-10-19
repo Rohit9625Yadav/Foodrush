@@ -13,58 +13,60 @@ document.addEventListener('DOMContentLoaded', () => {
     initMyOrders();
 });
 
-/* --- Smart Header Scroll Effect (Slide Up on Scroll Down, Instant Reveal on Scroll Up) --- */
+/* --- Smart Fixed Header Scroll Effect (Slide Up on Scroll Down, Instant Reveal on Scroll Up) --- */
 function initHeaderScroll() {
     const header = document.querySelector('.site-header');
     if (!header) return;
 
-    let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+    adjustBodyHeaderPadding();
+    window.addEventListener('resize', adjustBodyHeaderPadding);
+
+    let lastScrollY = Math.max(0, window.pageYOffset || document.documentElement.scrollTop);
     let isTicking = false;
-    const DOWN_THRESHOLD = 8; // Threshold in px to trigger slide-up when scrolling down
-    const UP_THRESHOLD = 4;   // Ultra-sensitive threshold to immediately reveal on scroll up ("halka sa bhi upr")
 
     function handleScroll() {
-        const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
         const drawer = document.getElementById('mobile-nav-drawer');
-        const isDrawerActive = drawer && drawer.classList.contains('active');
+        const isDrawerActive = drawer && (drawer.classList.contains('active') || document.body.classList.contains('mobile-drawer-open'));
         const ordersModal = document.getElementById('foodrush-orders-modal');
         const isModalActive = ordersModal && ordersModal.classList.contains('active');
 
-        // Never hide navbar if mobile drawer or a modal is currently open
+        // When drawer or modal is open, navbar stays 100% visible and fixed in place
         if (isDrawerActive || isModalActive) {
             header.classList.remove('nav-hidden');
             header.classList.add('nav-visible');
-            lastScrollY = currentScrollY;
             isTicking = false;
             return;
         }
 
-        // Apply scrolled style for backdrop blur & soft shadow
-        if (currentScrollY > 30) {
+        const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        const rawScroll = window.pageYOffset || document.documentElement.scrollTop;
+        const currentScrollY = Math.max(0, Math.min(rawScroll, maxScroll));
+        const delta = currentScrollY - lastScrollY;
+
+        // Apply scrolled style for soft shadow & backdrop blur
+        if (currentScrollY > 20) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
 
-        const delta = currentScrollY - lastScrollY;
-
-        // If near the very top of the page (within 60px), always show navbar
-        if (currentScrollY <= 60) {
-            header.classList.remove('nav-hidden');
-            header.classList.add('nav-visible');
-        } 
-        // When scrolling DOWN past 70px -> smoothly slide navbar up out of view
-        else if (delta > DOWN_THRESHOLD && currentScrollY > 70) {
-            header.classList.add('nav-hidden');
-            header.classList.remove('nav-visible');
-        } 
-        // When scrolling UP even slightly -> immediately reveal navbar
-        else if (delta < -UP_THRESHOLD) {
+        // 1. If at or near top of the page (within 40px), ALWAYS show navbar
+        if (currentScrollY <= 40) {
             header.classList.remove('nav-hidden');
             header.classList.add('nav-visible');
         }
+        // 2. Scrolling UP even slightly (delta <= -2px anywhere on page, even after scrolling all the way to bottom): IMMEDIATELY show navbar!
+        else if (delta <= -2) {
+            header.classList.remove('nav-hidden');
+            header.classList.add('nav-visible');
+        }
+        // 3. Scrolling DOWN (delta >= 6px) and past 60px: smoothly slide navbar up
+        else if (delta >= 6 && currentScrollY > 60) {
+            header.classList.add('nav-hidden');
+            header.classList.remove('nav-visible');
+        }
 
-        lastScrollY = Math.max(0, currentScrollY);
+        lastScrollY = currentScrollY;
         isTicking = false;
     }
 
@@ -76,7 +78,17 @@ function initHeaderScroll() {
     }, { passive: true });
 }
 
-/* --- Mobile Navigation Drawer --- */
+function adjustBodyHeaderPadding() {
+    const header = document.querySelector('.site-header');
+    if (header && !document.querySelector('.admin-layout')) {
+        const h = header.offsetHeight;
+        if (h > 0) {
+            document.body.style.paddingTop = h + 'px';
+        }
+    }
+}
+
+/* --- Mobile Navigation Drawer (Locked Viewport, No Bottom Gaps, Firm Navbar) --- */
 function initMobileNav() {
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const drawerCloseBtn = document.getElementById('drawer-close-btn');
@@ -131,25 +143,55 @@ function initMobileNav() {
 
     if (!hamburgerBtn) return;
 
+    let savedScrollY = 0;
+
     function openDrawer() {
+        savedScrollY = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Lock body firmly to prevent background scroll and bottom rubber-band gaps
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${savedScrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+        document.body.style.overflow = 'hidden';
+        document.body.classList.add('mobile-drawer-open');
+
+        // Keep navbar pinned and visible
         if (header) {
             header.classList.remove('nav-hidden');
             header.classList.add('nav-visible');
         }
+
         drawer.classList.add('active');
         if (overlay) overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
     }
 
     function closeDrawer() {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        document.body.classList.remove('mobile-drawer-open');
+
+        window.scrollTo(0, savedScrollY);
+
         drawer.classList.remove('active');
         if (overlay) overlay.classList.remove('active');
-        document.body.style.overflow = '';
     }
 
     hamburgerBtn.addEventListener('click', openDrawer);
     if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
     if (overlay) overlay.addEventListener('click', closeDrawer);
+
+    // Prevent background touchmove through overlay
+    if (overlay) {
+        overlay.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+    }
 }
 
 /* --- Toast Notification System --- */

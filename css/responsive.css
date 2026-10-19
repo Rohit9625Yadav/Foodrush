@@ -354,13 +354,28 @@
 
 /* --- 4. Mobile Phones & Tablets (max-width: 768px) --- */
 @media (max-width: 768px) {
+    body {
+        padding-top: 86px;
+    }
+
+    body:has(.admin-layout),
+    body.admin-body {
+        padding-top: 0 !important;
+    }
+
     /* Two-row Swiggy/Zomato-style Mobile Header so Logo & Actions stay perfectly aligned on row 1, Location Bar on row 2 */
     .site-header,
     .site-header.scrolled {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
         height: auto;
         min-height: auto;
         padding: 8px 0 10px;
         transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+        z-index: 1000;
     }
 
     .site-header.nav-hidden {
